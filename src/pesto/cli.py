@@ -50,7 +50,7 @@ def cmd_mutate(args: argparse.Namespace):
             include_paths=args.include or [],
         )
         stem = Path(c_file).stem
-        mutated_path = out_dir / f"{stem}_mutated.c"
+        mutated_path = out_dir / f"{stem}.c"
         mutated_path.write_text(mutated_code)
         mutated_paths.append(mutated_path)
 
