@@ -1,19 +1,22 @@
 """Run a target through patched python and print the escaping exception's c trace."""
 
+import argparse
 import re
 import subprocess
-import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PATCHED_PYTHON = PROJECT_ROOT / "vendor" / "cpython" / "python.exe"
-SENSITIVITY = 3
 
 
 def main():
-    target = sys.argv[1]
+    parser = argparse.ArgumentParser()
+    parser.add_argument("target")
+    parser.add_argument("-s", "--sensitivity", type=int, default=1)
+    args = parser.parse_args()
+
     result = subprocess.run(
-        [str(PATCHED_PYTHON), target],
+        [str(PATCHED_PYTHON), args.target],
         capture_output=True,
         text=True,
     )
@@ -34,7 +37,7 @@ def main():
         _, _, _, function_name, *_ = frame_line.split()
         frames.append(function_name)
 
-    print(f"{escaping_exception_type} | " + " ; ".join(frames[:SENSITIVITY]))
+    print(f"{escaping_exception_type} | " + " ; ".join(frames[:args.sensitivity]))
 
 
 if __name__ == "__main__":
