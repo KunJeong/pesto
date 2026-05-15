@@ -52,3 +52,15 @@ int scalar_and_ptr(int x, int *p) {
 int struct_access(struct Point pt) {
     return pt.x + pt.y;
 }
+
+/* Cccr + Ccsr */
+int mixed(int a) {
+    int c = 10;
+    return a + c + 1;
+}
+
+int increment(int x) {
+    x++;
+    --x;
+    return x + 100;
+}

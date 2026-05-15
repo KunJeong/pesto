@@ -6,18 +6,24 @@ import pycparser.c_ast as c_ast
 from pycparser import c_generator
 
 BINARY_MUTATIONS = {
-    # OASN (Arithmetic Operator by Shift Operator)
+    # OASN
     "+":  ["<<", ">>"], "-":  ["<<", ">>"], "*":  ["<<", ">>"], "/":  ["<<", ">>"],
-    # ORRN (Relational Operator Mutation)
+    # ORRN
     "<":  ["<=", ">", ">=", "==", "!="],
     "<=": ["<",  ">", ">=", "==", "!="],
     ">":  ["<", "<=", ">=", "==", "!="],
     ">=": ["<", "<=", ">",  "==", "!="],
     "==": ["<", "<=", ">",  ">=", "!="],
     "!=": ["<", "<=", ">",  ">=", "=="],
-    # OLBN (Logical Operator by Bitwise Operator)
+    # OLBN
     "&&": ["&"], "||": ["|"],
 }
+
+_NUMERIC_CONST_TYPES = frozenset({
+    'int', 'unsigned int', 'long', 'unsigned long',
+    'long long', 'unsigned long long',
+    'float', 'double', 'long double',
+})
 
 DEFAULT_CPP_ARGS = [
     "-E",
@@ -87,11 +93,42 @@ def _id_check(mid):
     )
 
 
-class MutationVisitor(c_ast.NodeVisitor):
+class ConstantCollector(c_ast.NodeVisitor):
+
     def __init__(self):
+        self._global = {} 
+        self._func = {} 
+        self._current = None
+
+    def visit_FuncDef(self, node):
+        self._current = node.decl.name
+        self._func.setdefault(self._current, {})
+        self.generic_visit(node)
+        self._current = None
+
+    def visit_Constant(self, node):
+        if node.type not in _NUMERIC_CONST_TYPES:
+            return
+        key = (node.type, node.value)
+        self._global[key] = None
+        if self._current is not None:
+            self._func[self._current][key] = None
+
+    def global_set(self):
+        return list(self._global)
+
+    def all_func_sets(self):
+        return {name: list(keys) for name, keys in self._func.items()}
+
+
+class MutationVisitor(c_ast.NodeVisitor):
+    def __init__(self, global_consts=(), func_consts=None):
         self._counter = 0
-        self._scopes = [{}]          # [{name: is_scalar}] — symbol table stack
+        self._scopes = [{}]
         self._suppress_scalar = False
+        self._global_consts = list(global_consts)
+        self._func_consts = func_consts or {}
+        self._current_func_name = None
 
     # Helper functions
     def _next_id(self):
@@ -194,6 +231,12 @@ class MutationVisitor(c_ast.NodeVisitor):
             )
         return result
 
+    def visit_Struct(self, node):
+        return node
+
+    def visit_Union(self, node):
+        return node
+
     def visit_Decl(self, node):
         if 'typedef' not in (node.storage or []):
             is_scalar = (
@@ -226,6 +269,9 @@ class MutationVisitor(c_ast.NodeVisitor):
         return node
 
     def visit_UnaryOp(self, node):
+        if node.op in ['p++', 'p--', '++', '--']:
+            self._visit_suppressed(node.expr)
+            return node
         if node.op == '*':
             was_suppressed = self._suppress_scalar
             self._suppress_scalar = True
@@ -235,12 +281,54 @@ class MutationVisitor(c_ast.NodeVisitor):
                 return node
             return self._domain_trap(node, self._twiddle(node))
         self.generic_visit(node)
-        return node 
+        return node
     
+    # VTWD + VDTR
     def visit_ID(self, node):
         if self._suppress_scalar or not self._is_scalar(node.name):
             return node
         return self._domain_trap(node, self._twiddle(node))
+    
+    def visit_FuncDef(self, node):
+        self._current_func_name = node.decl.name
+        self._scopes.append({})
+        self.generic_visit(node)
+        self._scopes.pop()
+        self._current_func_name = None
+        return node
+
+    def _ternary_chain(self, result, alts):
+        for alt in alts:
+            mid = self._next_id()
+            result = c_ast.TernaryOp(_id_check(mid), alt, result)
+        return result
+
+    # Cccr
+    def _cccr(self, node, key):
+        local = self._func_consts.get(self._current_func_name, [])
+        local_set = set(local)
+        alts = (
+            [c_ast.Constant(type=t, value=v) for t, v in local if (t, v) != key]
+            + [c_ast.Constant(type=t, value=v) for t, v in self._global_consts if (t, v) != key and (t, v) not in local_set]
+        )
+        return self._ternary_chain(node, alts)
+
+    # Ccsr
+    def _ccsr(self, result):
+        seen = set()
+        alts = []
+        for scope in self._scopes[1:] + self._scopes[:1]:
+            for name, is_scalar in scope.items():
+                if is_scalar and name not in seen:
+                    alts.append(c_ast.ID(name=name))
+                    seen.add(name)
+        return self._ternary_chain(result, alts)
+
+    def visit_Constant(self, node):
+        if self._suppress_scalar or node.type not in _NUMERIC_CONST_TYPES:
+            return node
+        key = (node.type, node.value)
+        return self._ccsr(self._cccr(node, key))
 
 
 def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None):
@@ -252,7 +340,13 @@ def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None):
 
     tree = pycparser.parse_file(c_file, use_cpp=True, cpp_path=cpp_path, cpp_args=args)
 
-    visitor = MutationVisitor()
+    collector = ConstantCollector()
+    collector.visit(tree)
+
+    visitor = MutationVisitor(
+        global_consts=collector.global_set(),
+        func_consts=collector.all_func_sets(),
+    )
     visitor.visit(tree)
 
     code = c_generator.CGenerator().visit(tree)
