@@ -30,10 +30,12 @@ def main():
         rf"\[PESTO-BEGIN type={re.escape(escaping_exception_type)}\](.*?)\[PESTO-END\]",
         re.DOTALL,
     )
-    last_matching_block = pesto_block_re.findall(result.stderr)[-1]
+
+    traces = "\n".join(result.stderr.splitlines()[4366:])
+    first_matching_block = pesto_block_re.findall(traces)[0]
 
     frames = []
-    for frame_line in last_matching_block.strip().splitlines():
+    for frame_line in first_matching_block.strip().splitlines():
         _, _, _, function_name, *_ = frame_line.split()
         frames.append(function_name)
 
