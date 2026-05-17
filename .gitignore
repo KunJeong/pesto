@@ -6,3 +6,4 @@ __pycache__/
 vendor/
 pesto_mutation/
 mutant
+mutated_cpython/
