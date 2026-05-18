@@ -94,6 +94,9 @@ double __pesto_trap_pos_dbl (double x) { if (x >  0.0) abort(); return x; }
 double __pesto_trap_zero_dbl(double x) { if (x == 0.0) abort(); return x; }
 """
 
+ALL_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "OASN", "OLBN", "SWDD", "SSDL", "Ccrc", "Ccrs"]
+DEFAULT_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR"]
+
 _ORRN_OPS = frozenset({"<", "<=", ">", ">=", "==", "!="})
 _ORRN_MUTATIONS = {
     "<":  ["<=", ">", ">=", "==", "!="],
@@ -104,9 +107,20 @@ _ORRN_MUTATIONS = {
     "!=": ["<", "<=", ">",  ">=", "=="],
 }
 
+_OASN_OPS = frozenset({"+", "-", "*", "/"})
+_OASN_MUTATIONS = {op: ["<<", ">>"] for op in _OASN_OPS}
+
+_OLBN_OPS = frozenset({"&&", "||"})
+_OLBN_MUTATIONS = {"&&": ["&"], "||": ["|"]}
+
 _PRIMITIVE_INT_TYPES = frozenset({
     'int', 'long', 'short', 'char', 'unsigned', 'signed',
     'float', 'double',
+})
+
+_NUMERIC_CONST_TYPES = frozenset({
+    'int', 'unsigned int', 'long', 'unsigned long',
+    'long long', 'unsigned long long', 'float', 'double', 'long double',
 })
 
 _CHILD_LIST_RE = re.compile(r"^(\w+)\[(\d+)\]$")
@@ -127,13 +141,45 @@ def _id_check(mid):
     )
 
 
+class ConstantCollector(c_ast.NodeVisitor):
+    def __init__(self):
+        self._global = {}
+        self._func = {}
+        self._current = None
+
+    def visit_FuncDef(self, node):
+        self._current = node.decl.name
+        self._func.setdefault(self._current, {})
+        self.generic_visit(node)
+        self._current = None
+
+    def visit_Constant(self, node):
+        if node.type not in _NUMERIC_CONST_TYPES:
+            return
+        key = (node.type, node.value)
+        self._global[key] = None
+        if self._current is not None:
+            self._func[self._current][key] = None
+
+    def global_set(self):
+        return list(self._global)
+
+    def all_func_sets(self):
+        return {name: list(keys) for name, keys in self._func.items()}
+
+
 class MutationVisitor(c_ast.NodeVisitor):
-    def __init__(self, scalar_typedefs=None):
+    def __init__(self, scalar_typedefs=None, enabled=None,
+                 global_consts=(), func_consts=None):
         self._counter = 0
         self._mutations = []
         self._scopes = [{}]
         self._suppress_scalar = False
         self._scalar_typedefs = scalar_typedefs if scalar_typedefs is not None else set()
+        self._enabled = set(enabled) if enabled is not None else set(DEFAULT_MUTATION_TYPES)
+        self._global_consts = list(global_consts)
+        self._func_consts = func_consts or {}
+        self._current_func_name = None
 
     def _next_id(self, mutation_type, **info):
         n = self._counter
@@ -162,25 +208,62 @@ class MutationVisitor(c_ast.NodeVisitor):
                     return True
         return False
 
-    # ORRN
+    # ORRN, OASN, OLBN
     def visit_BinaryOp(self, node):
         self.generic_visit(node)
-        if node.op not in _ORRN_OPS:
-            return node
-        alternatives = _ORRN_MUTATIONS.get(node.op, [])
         result = node
-        for alt_op in alternatives:
-            mid = self._next_id("ORRN", op=node.op, alt=alt_op)
-            result = c_ast.TernaryOp(
-                cond=_id_check(mid),
-                iftrue=c_ast.BinaryOp(op=alt_op, left=deepcopy(node.left), right=deepcopy(node.right)),
-                iffalse=result,
-            )
+        if node.op in _ORRN_OPS and "ORRN" in self._enabled:
+            for alt_op in _ORRN_MUTATIONS[node.op]:
+                mid = self._next_id("ORRN", op=node.op, alt=alt_op)
+                result = c_ast.TernaryOp(
+                    cond=_id_check(mid),
+                    iftrue=c_ast.BinaryOp(op=alt_op, left=deepcopy(node.left), right=deepcopy(node.right)),
+                    iffalse=result,
+                )
+        if node.op in _OASN_OPS and "OASN" in self._enabled:
+            for alt_op in _OASN_MUTATIONS[node.op]:
+                mid = self._next_id("OASN", op=node.op, alt=alt_op)
+                result = c_ast.TernaryOp(
+                    cond=_id_check(mid),
+                    iftrue=c_ast.BinaryOp(op=alt_op, left=deepcopy(node.left), right=deepcopy(node.right)),
+                    iffalse=result,
+                )
+        if node.op in _OLBN_OPS and "OLBN" in self._enabled:
+            for alt_op in _OLBN_MUTATIONS[node.op]:
+                mid = self._next_id("OLBN", op=node.op, alt=alt_op)
+                result = c_ast.TernaryOp(
+                    cond=_id_check(mid),
+                    iftrue=c_ast.BinaryOp(op=alt_op, left=deepcopy(node.left), right=deepcopy(node.right)),
+                    iffalse=result,
+                )
         return result
 
+    # SWDD
+    def visit_While(self, node):
+        self.generic_visit(node)
+        if "SWDD" not in self._enabled:
+            return node
+        mid = self._next_id("SWDD")
+        do_while = c_ast.DoWhile(cond=deepcopy(node.cond), stmt=deepcopy(node.stmt))
+        return c_ast.If(cond=_id_check(mid), iftrue=do_while, iffalse=node)
+
+    # SSDL + scope management
     def visit_Compound(self, node):
         self._scopes.append({})
         self.generic_visit(node)
+        if "SSDL" in self._enabled and node.block_items:
+            new_items = []
+            for stmt in node.block_items:
+                if isinstance(stmt, c_ast.Decl):
+                    new_items.append(stmt)
+                else:
+                    mid = self._next_id("SSDL")
+                    new_items.append(c_ast.If(
+                        cond=_id_check(mid),
+                        iftrue=c_ast.Compound(block_items=None),
+                        iffalse=stmt,
+                    ))
+            node.block_items = new_items
         self._scopes.pop()
         return node
 
@@ -221,6 +304,34 @@ class MutationVisitor(c_ast.NodeVisitor):
                 iffalse=result,
             )
         return result
+
+    def _ternary_chain(self, result, alts, mutation_type):
+        for alt in alts:
+            mid = self._next_id(mutation_type)
+            result = c_ast.TernaryOp(_id_check(mid), alt, result)
+        return result
+
+    # Ccrc
+    def _cccr(self, node, key):
+        local = self._func_consts.get(self._current_func_name, [])
+        local_set = set(local)
+        alts = (
+            [c_ast.Constant(type=t, value=v) for t, v in local if (t, v) != key]
+            + [c_ast.Constant(type=t, value=v) for t, v in self._global_consts
+               if (t, v) != key and (t, v) not in local_set]
+        )
+        return self._ternary_chain(node, alts, "Ccrc")
+
+    # Ccrs
+    def _ccsr(self, result):
+        seen = set()
+        alts = []
+        for scope in self._scopes[1:] + self._scopes[:1]:
+            for name, is_scalar in scope.items():
+                if is_scalar and name not in seen:
+                    alts.append(c_ast.ID(name=name))
+                    seen.add(name)
+        return self._ternary_chain(result, alts, "Ccrs")
 
     def visit_Struct(self, node):
         return node
@@ -289,12 +400,31 @@ class MutationVisitor(c_ast.NodeVisitor):
     def visit_ID(self, node):
         if self._suppress_scalar or not self._is_scalar(node.name):
             return node
-        return self._domain_trap(node, self._twiddle(node))
+        result = node
+        if "VTWD" in self._enabled:
+            result = self._twiddle(result)
+        if "VDTR" in self._enabled:
+            result = self._domain_trap(node, result)
+        return result
+
+    # Ccrc + Ccrs
+    def visit_Constant(self, node):
+        if self._suppress_scalar or node.type not in _NUMERIC_CONST_TYPES:
+            return node
+        result = node
+        key = (node.type, node.value)
+        if "Ccrc" in self._enabled:
+            result = self._cccr(result, key)
+        if "Ccrs" in self._enabled:
+            result = self._ccsr(result)
+        return result
 
     def visit_FuncDef(self, node):
+        self._current_func_name = node.decl.name
         self._scopes.append({})
         self.generic_visit(node)
         self._scopes.pop()
+        self._current_func_name = None
         return node
 
 
@@ -333,7 +463,8 @@ def _decl_name(node):
     return None
 
 
-def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None):
+def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
+                enabled_mutations=None):
     args = list(DEFAULT_CPP_ARGS)
     if include_paths:
         args.extend(f"-I{p}" for p in include_paths)
@@ -364,7 +495,21 @@ def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None):
     ]
     tree.ext = target_decls
 
-    visitor = MutationVisitor(scalar_typedefs=scalar_typedefs)
+    enabled = set(enabled_mutations) if enabled_mutations is not None else set(DEFAULT_MUTATION_TYPES)
+
+    global_consts, func_consts = (), {}
+    if "Ccrc" in enabled or "Ccrs" in enabled:
+        collector = ConstantCollector()
+        collector.visit(tree)
+        global_consts = collector.global_set()
+        func_consts = collector.all_func_sets()
+
+    visitor = MutationVisitor(
+        scalar_typedefs=scalar_typedefs,
+        enabled=enabled,
+        global_consts=global_consts,
+        func_consts=func_consts,
+    )
     visitor.visit(tree)
 
     code = c_generator.CGenerator().visit(tree)
