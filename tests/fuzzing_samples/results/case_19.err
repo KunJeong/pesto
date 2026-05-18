@@ -1,0 +1,10 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_19.py", line 20, in <module>
+    outer()
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_19.py", line 19, in outer
+    return inner()
+           ^^^^^^^
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_19.py", line 16, in inner
+    return obj['missing']
+           ~~~^^^^^^^^^^^
+KeyError: 'missing'

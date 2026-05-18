@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_17.py", line 29, in <module>
+    Runner().go()
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_17.py", line 28, in go
+    return divmod(1, 0)
+           ^^^^^^^^^^^^
+ZeroDivisionError: integer division or modulo by zero

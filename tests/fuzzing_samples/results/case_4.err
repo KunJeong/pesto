@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_4.py", line 16, in <module>
+    text.encode(1)
+TypeError: encode() argument 'encoding' must be str, not int

@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_2.py", line 13, in <module>
+    mapping['missing']
+    ~~~~~~~^^^^^^^^^^^
+KeyError: 'missing'

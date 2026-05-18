@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_9.py", line 10, in <module>
+    raise NotImplementedError('todo')
+NotImplementedError: todo

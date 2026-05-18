@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_18.py", line 19, in <module>
+    explode()
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_18.py", line 18, in explode
+    return chr(-1)
+           ^^^^^^^
+ValueError: chr() arg not in range(0x110000)
