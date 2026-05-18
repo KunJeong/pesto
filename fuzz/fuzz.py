@@ -40,7 +40,7 @@ class Session:
         self.round_limit = int(args.rounds)
         self.outdir = Path(args.outdir).resolve()
         self.base = self.outdir.parent
-        self.resultdir = self.base / 'results'
+        self.resultdir = self.outdir / 'results'
         self.next_seed = args.seed if args.seed is not None else random.randrange(2**31)
         self.next_case_id = 0
         self.seen: set[str] = set()
