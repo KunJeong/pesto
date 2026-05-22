@@ -1,6 +1,7 @@
 import argparse
 import json
 import os
+import platform
 import re
 import subprocess
 import sys
@@ -10,11 +11,26 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PATCHED_CPYTHON_ROOT = PROJECT_ROOT / "vendor" / "cpython"
 _TRACE_SKIP = 4366
 
+# Patched CPython is built as `python.exe` on macOS and `python` on Linux/WSL,
+# and backtrace_symbols_fd() formats frames differently on each platform.
+_IS_DARWIN = platform.system() == "Darwin"
+_PATCHED_PYTHON = PATCHED_CPYTHON_ROOT / ("python.exe" if _IS_DARWIN else "python")
+_LINUX_FRAME_RE = re.compile(r"\(([^+)]+)\+")
+
+
+def extract_frame(line: str):
+    if _IS_DARWIN:
+        # "0   python.exe   0x...   _PyErr_SetObject + 212"
+        parts = line.split()
+        return parts[3] if len(parts) >= 4 else None
+    # glibc: "python(_PyErr_SetObject+0x...) [0x...]"
+    m = _LINUX_FRAME_RE.search(line)
+    return m.group(1) if m else None
 
 
 def cmd_trace(args: argparse.Namespace):
     result = subprocess.run(
-        [str(PATCHED_CPYTHON_ROOT / "python"), args.target],
+        [str(_PATCHED_PYTHON), args.target],
         capture_output=True,
         text=True,
     )
@@ -32,9 +48,8 @@ def cmd_trace(args: argparse.Namespace):
     traces = "\n".join(result.stderr.splitlines()[_TRACE_SKIP:])
     first_matching_block = pesto_block_re.findall(traces)[0]
 
-    sym_re = re.compile(r'\(([^+)]+)\+')
-    frames = [m.group(1) for line in first_matching_block.strip().splitlines()
-              if (m := sym_re.search(line))]
+    frames = [f for line in first_matching_block.strip().splitlines()
+              if (f := extract_frame(line)) is not None]
 
     print(f"{escaping_exception_type} | " + " ; ".join(frames[: args.sensitivity]))
 
