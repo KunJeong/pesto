@@ -40,7 +40,7 @@ def cmd_trace(args: argparse.Namespace):
 
 
 def _parse_mutations(numbers):
-    from pesto.mutator import ALL_MUTATION_TYPES
+    from mutator import ALL_MUTATION_TYPES
     result = []
     for n in numbers:
         if not (1 <= n <= len(ALL_MUTATION_TYPES)):
@@ -53,7 +53,7 @@ def _parse_mutations(numbers):
 
 
 def cmd_mutate(args: argparse.Namespace):
-    from pesto.mutator import mutate_file
+    from mutator import mutate_file
 
     enabled = _parse_mutations(args.mutations) if args.mutations else None
 
@@ -86,7 +86,7 @@ def cmd_mutate(args: argparse.Namespace):
 
 
 def cmd_mutate_cpython(args: argparse.Namespace):
-    from pesto.mutator import mutate_file, CPYTHON_DEFINES, CPYTHON_HEADERS
+    from mutator import mutate_file, CPYTHON_DEFINES, CPYTHON_HEADERS
 
     sys.setrecursionlimit(50000)
 
@@ -171,7 +171,7 @@ def cmd_mutate_cpython(args: argparse.Namespace):
 
 
 def cmd_evaluate(args: argparse.Namespace):
-    from pesto.evaluator import run_evaluation
+    from evaluator import run_evaluation
 
     run_evaluation(
         sample=args.sample,
