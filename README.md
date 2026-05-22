@@ -52,3 +52,11 @@ You can also control how many input files are reduced in parallel:
 ```bash
 python3 scripts/run-reducers.py -o [RESULTS_DIR] -j [JOBS]
 ```
+
+## Deduplicating Reduced Programs
+
+Keep one representative per unique AST:
+
+```bash
+python3 scripts/dedup.py -i reduced -o dedup
+```
