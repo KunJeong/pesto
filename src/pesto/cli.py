@@ -131,16 +131,26 @@ def cmd_mutate_cpython(args: argparse.Namespace):
     rel = target.parent.relative_to(PATCHED_CPYTHON_ROOT)
     runtime_obj = f"{rel}/pesto_runtime.o"
     runtime_src = f"{rel}/pesto_runtime.c"
+    mutated_obj = f"{rel}/{target.stem}.o"
+    mutated_src = f"{rel}/{target.stem}.c"
 
     makefile = PATCHED_CPYTHON_ROOT / "Makefile"
     content = makefile.read_text()
+    additions = ""
     if "# PESTO additions" not in content:
-        makefile.write_text(content + (
+        additions += (
             f"\n# PESTO additions\n"
             f"OBJECT_OBJS += {runtime_obj}\n\n"
             f"{runtime_obj}: {runtime_src}\n"
             f"\t$(CC) -c -O2 -o $@ $<\n"
-        ))
+        )
+    if f"{mutated_obj}:" not in content:
+        additions += (
+            f"\n{mutated_obj}: {mutated_src}\n"
+            f"\t$(CC) $(filter-out -O%,$(PY_CORE_CFLAGS)) -O0 -c -o $@ $<\n"
+        )
+    if additions:
+        makefile.write_text(content + additions)
         print("Patched Makefile.")
 
     subprocess.run(

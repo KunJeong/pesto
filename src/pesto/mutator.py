@@ -95,7 +95,7 @@ double __pesto_trap_zero_dbl(double x) { if (x == 0.0) abort(); return x; }
 """
 
 ALL_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "OASN", "OLBN", "SWDD", "SSDL", "Ccrc", "Ccrs"]
-DEFAULT_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR"]
+DEFAULT_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "SSDL"]
 
 _ORRN_OPS = frozenset({"<", "<=", ">", ">=", "==", "!="})
 _ORRN_MUTATIONS = {
