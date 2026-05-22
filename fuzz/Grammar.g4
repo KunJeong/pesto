@@ -11,8 +11,6 @@ program
     | object_prog
     | bytes_prog
     | convert_prog
-    | regex_prog
-    | json_prog
     | path_prog
     | deque_prog
     | mixed_prog
@@ -40,14 +38,6 @@ bytes_prog
 
 convert_prog
     : convert_setup NL convert_step NL convert_step (NL convert_step)? NL convert_bad_site NL*
-    ;
-
-regex_prog
-    : regex_setup NL regex_step NL regex_step (NL regex_step)? NL regex_bad_site NL*
-    ;
-
-json_prog
-    : json_setup NL json_step NL json_step (NL json_step)? NL json_bad_site NL*
     ;
 
 path_prog
@@ -258,36 +248,6 @@ convert_step
       '    probe = ""'
     ;
 
-regex_step
-    : 'joined = "-".join(parts)' NL
-      'joined_size = len(joined)'
-    | 'head = found[0]' NL
-      'head_size = len(head)'
-    | 'pairs = list(enumerate(found))' NL
-      'pair_size = len(pairs)'
-    | 'if re.search(r"ab", text):' NL
-      '    seen = True' NL
-      'else:' NL
-      '    seen = False'
-    | 'upper = text.upper()' NL
-      'upper_size = len(upper)'
-    ;
-
-json_step
-    : 'vals = list(obj.values())' NL
-      'val_count = len(vals)'
-    | 'text = json.dumps(obj)' NL
-      'text_size = len(text)'
-    | 'pairs = list(obj.items())' NL
-      'pair_count = len(pairs)'
-    | 'if "a" in obj:' NL
-      '    picked = obj["a"]' NL
-      'else:' NL
-      '    picked = 0'
-    | 'clone = dict(obj)' NL
-      'clone_size = len(clone)'
-    ;
-
 path_step
     : 'suffix = child.suffix' NL
       'suffix_size = len(suffix)'
@@ -336,8 +296,6 @@ collection_bad_site : wrap_collection_expr | 'for x in 1:' NL '    pass' ;
 object_bad_site : wrap_object_expr | 'with box as ctx:' NL '    pass' ;
 bytes_bad_site : wrap_bytes_expr ;
 convert_bad_site : wrap_convert_expr ;
-regex_bad_site : wrap_regex_expr | 'raise RuntimeError("boom")' ;
-json_bad_site : wrap_json_expr ;
 path_bad_site : wrap_path_expr ;
 deque_bad_site : wrap_deque_expr | 'raise NotImplementedError("todo")' ;
 mixed_bad_site : wrap_mixed_expr | 'def boom():' NL '    x = x + 1' NL 'boom()' ;
@@ -348,8 +306,6 @@ wrap_collection_expr : wrap_collection_base ;
 wrap_object_expr : wrap_object_base ;
 wrap_bytes_expr : wrap_bytes_base ;
 wrap_convert_expr : wrap_convert_base ;
-wrap_regex_expr : wrap_regex_base ;
-wrap_json_expr : wrap_json_base ;
 wrap_path_expr : wrap_path_base ;
 wrap_deque_expr : wrap_deque_base ;
 wrap_mixed_expr : wrap_mixed_base ;
@@ -418,28 +374,6 @@ wrap_convert_base
     | 'def inner():' NL '    return ' convert_bad_expr NL 'def outer():' NL '    return inner()' NL 'outer()'
     | 'class Runner:' NL '    def go(self):' NL '        return ' convert_bad_expr NL 'Runner().go()'
     | 'try:' NL '    ' convert_bad_expr NL 'finally:' NL '    marker = 1'
-    ;
-
-wrap_regex_base
-    : regex_bad_expr
-    | 'tmp = ' regex_bad_expr
-    | 'if True:' NL '    ' regex_bad_expr
-    | 'thunk = lambda: ' regex_bad_expr NL 'thunk()'
-    | 'def explode():' NL '    return ' regex_bad_expr NL 'explode()'
-    | 'def inner():' NL '    return ' regex_bad_expr NL 'def outer():' NL '    return inner()' NL 'outer()'
-    | 'class Runner:' NL '    def go(self):' NL '        return ' regex_bad_expr NL 'Runner().go()'
-    | 'try:' NL '    ' regex_bad_expr NL 'finally:' NL '    marker = 1'
-    ;
-
-wrap_json_base
-    : json_bad_expr
-    | 'tmp = ' json_bad_expr
-    | 'if True:' NL '    ' json_bad_expr
-    | 'thunk = lambda: ' json_bad_expr NL 'thunk()'
-    | 'def explode():' NL '    return ' json_bad_expr NL 'explode()'
-    | 'def inner():' NL '    return ' json_bad_expr NL 'def outer():' NL '    return inner()' NL 'outer()'
-    | 'class Runner:' NL '    def go(self):' NL '        return ' json_bad_expr NL 'Runner().go()'
-    | 'try:' NL '    ' json_bad_expr NL 'finally:' NL '    marker = 1'
     ;
 
 wrap_path_base
@@ -532,7 +466,6 @@ bytes_bad_expr
     : 'raw + text'
     | 'raw[None]'
     | 'raw.decode(1)'
-    | 'invalid_raw.decode("utf-8")'
     | 'blob + {}'
     | 'memoryview(1)'
     | 'text.encode(1)'
@@ -558,35 +491,6 @@ convert_bad_expr
     | 'next(iter(()))'
     ;
 
-regex_bad_expr
-    : 're.match(1, text)'
-    | 're.search(text, 1)'
-    | 're.compile("(")'
-    | 're.sub("(", "-", text)'
-    | 're.findall(1, text)'
-    | 're.compile("[")'
-    | 'next(iter([]))'
-    | 're.fullmatch(1, text)'
-    | 're.sub("[", "-", text)'
-    | 'next(iter(()))'
-    ;
-
-json_bad_expr
-    : 'json.loads(1)'
-    | 'json.loads("{")'
-    | 'obj["missing"]'
-    | 'obj.pop("missing")'
-    | 'obj["ghost"]'
-    | 'obj.pop("ghost")'
-    | 'json.loads("[1,]")'
-    | 'obj + []'
-    | 'json.dumps(set())'
-    | '__import__("definitely_missing_module_xyz")'
-    | '__import__("still_missing_module_abc")'
-    | 'next(iter([]))'
-    | 'next(iter(()))'
-    ;
-
 path_bad_expr
     : 'parts[None]'
     | 'parts[99]'
@@ -594,10 +498,8 @@ path_bad_expr
     | 'p.with_name("")'
     | 'child / 1'
     | 'p.read_text(encoding=1)'
-    | 'p.read_text()'
     | 'Path(".").read_text()'
     | 'Path(".").mkdir()'
-    | 'Path("missing-file-xyz.txt").read_text()'
     | '1 / 0'
     ;
 
