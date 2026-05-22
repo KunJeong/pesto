@@ -70,13 +70,15 @@ def _evaluate_mutant(python_exe, test_files, baselines, mutation_info, mid, time
     return mid, {"status": "survived", **info}
 
 
-def run_evaluation(sample=None, seed=42, timeout=10.0):
-    python_exe = str(LONGOBJECT_PYTHON)
-    test_files = sorted(TESTS_DIR.glob("*.py"))
+def run_evaluation(sample=None, seed=42, timeout=10.0, tests_dir=None, binary=None, meta=None):
+    python_exe = binary or str(LONGOBJECT_PYTHON)
+    _meta = Path(meta) if meta else LONGOBJECT_META
+    _tests_dir = Path(tests_dir) if tests_dir else TESTS_DIR
+    test_files = sorted(_tests_dir.glob("*.py"))
     if not test_files:
-        raise ValueError(f"No .py files found in {TESTS_DIR}")
+        raise ValueError(f"No .py files found in {_tests_dir}")
 
-    meta_data = json.loads(LONGOBJECT_META.read_text())
+    meta_data = json.loads(_meta.read_text())
     mutation_count = meta_data["mutation_count"]
     mutation_info = {m["id"]: m for m in meta_data.get("mutations", [])}
 

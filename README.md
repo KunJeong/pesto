@@ -8,8 +8,24 @@ python3 src/pesto/cli.py trace tests/add_1.py
 python3 src/pesto/cli.py mutate test.c [-I DIR] [-m N ...]
 # mutate cpython longobject and build
 python3 src/pesto/cli.py mutate-cpython [file] [-m N ...]
-# evaluate mutation score
-python3 src/pesto/cli.py evaluate [--sample N] [--seed N] [--timeout S]
+# evaluate mutation score (CPython)
+python3 src/pesto/cli.py evaluate [--sample N] [--seed N] [--timeout S] [--tests-dir DIR]
+# evaluate mutation score (arbitrary target)
+python3 src/pesto/cli.py evaluate --binary ./mutant --meta pesto_mutation/target.meta.json --tests-dir DIR
+```
+
+## Evaluating Non-CPython Targets
+
+```bash
+# 1. mutate a C file
+python3 src/pesto/cli.py mutate target.c [-I DIR] [-m N ...]
+# 2. compile the mutated binary
+gcc pesto_mutation/target.c pesto_mutation/pesto_runtime.c -o mutant
+# 3. evaluate
+python3 src/pesto/cli.py evaluate \
+  --binary ./mutant \
+  --meta pesto_mutation/target.meta.json \
+  --tests-dir ./tests
 ```
 
 ## Running Perses Reducer

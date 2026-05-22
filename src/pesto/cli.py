@@ -8,8 +8,6 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 PATCHED_CPYTHON_ROOT = PROJECT_ROOT / "vendor" / "cpython"
-TESTS_DIR = PROJECT_ROOT / "tests"
-
 _TRACE_SKIP = 4366
 
 
@@ -179,6 +177,9 @@ def cmd_evaluate(args: argparse.Namespace):
         sample=args.sample,
         seed=args.seed,
         timeout=args.timeout,
+        tests_dir=args.tests_dir,
+        binary=args.binary,
+        meta=args.meta,
     )
 
 
@@ -206,6 +207,9 @@ def main():
     eval_p.add_argument("--sample", type=int, default=None)
     eval_p.add_argument("--seed", type=int, default=42)
     eval_p.add_argument("--timeout", type=float, default=10.0)
+    eval_p.add_argument("--tests-dir", type=str, default=None, metavar="DIR")
+    eval_p.add_argument("--binary", type=str, default=None, metavar="PATH")
+    eval_p.add_argument("--meta", type=str, default=None, metavar="PATH")
     eval_p.set_defaults(func=cmd_evaluate)
 
     args = parser.parse_args()

@@ -1,0 +1,92 @@
+{
+  "mutation_count_total": 11920,
+  "mutation_count_evaluated": 10,
+  "sample_seed": 1,
+  "killed": 1,
+  "survived": 9,
+  "mutation_score": 0.1,
+  "type_stats": {
+    "ORRN": {
+      "killed": 1,
+      "survived": 5
+    },
+    "VDTR": {
+      "killed": 0,
+      "survived": 3
+    },
+    "SSDL": {
+      "killed": 0,
+      "survived": 1
+    }
+  },
+  "per_mutant": {
+    "1033": {
+      "status": "killed",
+      "killed_by": [
+        "add_0.py"
+      ],
+      "id": 1033,
+      "type": "ORRN",
+      "op": "==",
+      "alt": ">="
+    },
+    "1931": {
+      "status": "survived",
+      "id": 1931,
+      "type": "ORRN",
+      "op": "!=",
+      "alt": ">="
+    },
+    "4179": {
+      "status": "survived",
+      "id": 4179,
+      "type": "VDTR",
+      "trap": "__pesto_trap_neg"
+    },
+    "6219": {
+      "status": "survived",
+      "id": 6219,
+      "type": "ORRN",
+      "op": "==",
+      "alt": "<="
+    },
+    "9325": {
+      "status": "survived",
+      "id": 9325,
+      "type": "VDTR",
+      "trap": "__pesto_trap_pos"
+    },
+    "7364": {
+      "status": "survived",
+      "id": 7364,
+      "type": "SSDL"
+    },
+    "8117": {
+      "status": "survived",
+      "id": 8117,
+      "type": "ORRN",
+      "op": "!=",
+      "alt": ">"
+    },
+    "2201": {
+      "status": "survived",
+      "id": 2201,
+      "type": "ORRN",
+      "op": "==",
+      "alt": "<"
+    },
+    "7737": {
+      "status": "survived",
+      "id": 7737,
+      "type": "VDTR",
+      "trap": "__pesto_trap_pos"
+    },
+    "10675": {
+      "status": "survived",
+      "id": 10675,
+      "type": "ORRN",
+      "op": "<",
+      "alt": ">="
+    }
+  }
+}
