@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_7.py", line 15, in <module>
+    Runner().go()
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_7.py", line 14, in go
+    return __import__('definitely_missing_module_xyz')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'definitely_missing_module_xyz'

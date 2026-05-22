@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_10.py", line 12, in <module>
+    tmp = complex('xyz')
+          ^^^^^^^^^^^^^^
+ValueError: complex() arg is a malformed string

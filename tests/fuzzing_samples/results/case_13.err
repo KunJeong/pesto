@@ -1,0 +1,9 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_13.py", line 12, in <module>
+    thunk()
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_13.py", line 11, in <lambda>
+    thunk = lambda: p.relative_to('zzz')
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/pathlib.py", line 731, in relative_to
+    raise ValueError("{!r} is not in the subpath of {!r}"
+ValueError: 'alpha/beta.txt' is not in the subpath of 'zzz' OR one path is relative and the other is absolute.

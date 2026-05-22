@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_8.py", line 15, in <module>
+    Runner().go()
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_8.py", line 14, in go
+    return deque().pop()
+           ^^^^^^^^^^^^^
+IndexError: pop from an empty deque

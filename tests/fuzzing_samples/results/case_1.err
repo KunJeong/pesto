@@ -1,0 +1,7 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_1.py", line 26, in <module>
+    boom()
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_1.py", line 25, in boom
+    x = x + 1
+        ^
+UnboundLocalError: cannot access local variable 'x' where it is not associated with a value

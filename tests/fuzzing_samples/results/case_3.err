@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_3.py", line 11, in <module>
+    memoryview(1)
+TypeError: memoryview: a bytes-like object is required, not 'int'

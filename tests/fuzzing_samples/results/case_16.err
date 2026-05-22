@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_16.py", line 10, in <module>
+    next(dq)
+TypeError: 'collections.deque' object is not an iterator

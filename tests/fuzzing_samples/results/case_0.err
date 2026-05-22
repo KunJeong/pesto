@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "/root/es/zclass/pesto/tests/fuzzing_samples/case_0.py", line 16, in <module>
+    range('x')
+TypeError: 'str' object cannot be interpreted as an integer
