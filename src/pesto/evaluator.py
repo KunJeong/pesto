@@ -4,6 +4,7 @@ import random
 import subprocess
 import time
 from collections import defaultdict
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -56,6 +57,19 @@ LONGOBJECT_PYTHON = PROJECT_ROOT / "vendor" / "cpython" / "python"
 TESTS_DIR = PROJECT_ROOT / "tests"
 
 
+def _evaluate_mutant(python_exe, test_files, baselines, mutation_info, mid, timeout):
+    killing_tests = []
+    for tf in test_files:
+        result = run_test(python_exe, str(tf), mid, timeout)
+        if is_killed(baselines[str(tf)], result):
+            killing_tests.append(tf.name)
+            break
+    info = mutation_info.get(mid, {})
+    if killing_tests:
+        return mid, {"status": "killed", "killed_by": killing_tests, **info}
+    return mid, {"status": "survived", **info}
+
+
 def run_evaluation(sample=None, seed=42, timeout=10.0):
     python_exe = str(LONGOBJECT_PYTHON)
     test_files = sorted(TESTS_DIR.glob("*.py"))
@@ -77,37 +91,37 @@ def run_evaluation(sample=None, seed=42, timeout=10.0):
 
     print(f"{len(test_files)} test files | timeout={timeout}s")
 
+    n_workers = os.cpu_count() or 4
+
     print("\n[Baseline] Running with PESTO_MUTANT_ID=-1 ...")
     baselines = {}
-    for tf in test_files:
-        result = run_test(python_exe, str(tf), -1, timeout)
-        baselines[str(tf)] = result
-        status = "TIMEOUT" if result["timed_out"] else f"exit={result['exit_code']}"
-        print(f"  {tf.name}: {status}")
+    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+        future_to_tf = {executor.submit(run_test, python_exe, str(tf), -1, timeout): tf for tf in test_files}
+        for future in as_completed(future_to_tf):
+            tf = future_to_tf[future]
+            result = future.result()
+            baselines[str(tf)] = result
+            status = "TIMEOUT" if result["timed_out"] else f"exit={result['exit_code']}"
+            print(f"  {tf.name}: {status}")
 
-    print(f"\n[Mutations] Evaluating {len(sampled_ids)} mutations ...")
+    print(f"\n[Mutations] Evaluating {len(sampled_ids)} mutations (workers={n_workers}) ...")
     killed, per_mutant = 0, {}
     start = time.monotonic()
 
-    for i, mid in enumerate(sampled_ids):
-        killing_tests = []
-        for tf in test_files:
-            result = run_test(python_exe, str(tf), mid, timeout)
-            if is_killed(baselines[str(tf)], result):
-                killing_tests.append(tf.name)
-                break
-
-        info = mutation_info.get(mid, {})
-        if killing_tests:
-            killed += 1
-            per_mutant[mid] = {"status": "killed", "killed_by": killing_tests, **info}
-        else:
-            per_mutant[mid] = {"status": "survived", **info}
-
-        if (i + 1) % 50 == 0 or (i + 1) == len(sampled_ids):
-            elapsed = time.monotonic() - start
-            print(f"  [{i+1}/{len(sampled_ids)}] killed={killed} "
-                  f"score={killed/(i+1):.1%} elapsed={elapsed:.1f}s", flush=True)
+    with ThreadPoolExecutor(max_workers=n_workers) as executor:
+        futures = {
+            executor.submit(_evaluate_mutant, python_exe, test_files, baselines, mutation_info, mid, timeout): mid
+            for mid in sampled_ids
+        }
+        for i, future in enumerate(as_completed(futures)):
+            mid, result = future.result()
+            per_mutant[mid] = result
+            if result["status"] == "killed":
+                killed += 1
+            if (i + 1) % 50 == 0 or (i + 1) == len(sampled_ids):
+                elapsed = time.monotonic() - start
+                print(f"  [{i+1}/{len(sampled_ids)}] killed={killed} "
+                      f"score={killed/(i+1):.1%} elapsed={elapsed:.1f}s", flush=True)
 
     total_evaluated = len(sampled_ids)
     score = killed / total_evaluated if total_evaluated else 0.0
