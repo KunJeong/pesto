@@ -34,7 +34,9 @@ def cmd_trace(args: argparse.Namespace):
     traces = "\n".join(result.stderr.splitlines()[_TRACE_SKIP:])
     first_matching_block = pesto_block_re.findall(traces)[0]
 
-    frames = [line.split()[3] for line in first_matching_block.strip().splitlines()]
+    sym_re = re.compile(r'\(([^+)]+)\+')
+    frames = [m.group(1) for line in first_matching_block.strip().splitlines()
+              if (m := sym_re.search(line))]
 
     print(f"{escaping_exception_type} | " + " ; ".join(frames[: args.sensitivity]))
 

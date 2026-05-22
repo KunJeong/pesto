@@ -34,6 +34,7 @@ fi
 
 PYTHON_BIN="${PESTO_PYTHON:-python3}"
 CLI="$ROOT/src/pesto/cli.py"
+TRACE="trace"
 
 # Expected summary is the original program's stderr trace summary.
 EXPECTED_SUMMARY="${PESTO_EXPECTED_SUMMARY:-}"
@@ -43,14 +44,14 @@ if [[ -z "$EXPECTED_SUMMARY" ]]; then
     exit 2
   fi
   # If PESTO_EXPECTED_SUMMARY is not set, compute the expected summary by running the original input through the CLI.
-  if ! EXPECTED_SUMMARY="$("$PYTHON_BIN" "$CLI" "$PESTO_ORIGINAL_INPUT" -s "$SENSITIVITY")"; then
+  if ! EXPECTED_SUMMARY="$("$PYTHON_BIN" "$CLI" "$TRACE" "$PESTO_ORIGINAL_INPUT" -s "$SENSITIVITY")"; then
     echo "failed to compute original summary for $PESTO_ORIGINAL_INPUT" >&2
     exit 1
   fi
 fi
 
 # Accept the candidate only if it preserves the exact same summary.
-if ! CANDIDATE_SUMMARY="$("$PYTHON_BIN" "$CLI" "$CANDIDATE" -s "$SENSITIVITY")"; then
+if ! CANDIDATE_SUMMARY="$("$PYTHON_BIN" "$CLI" "$TRACE" "$CANDIDATE" -s "$SENSITIVITY")"; then
   exit 1
 fi
 

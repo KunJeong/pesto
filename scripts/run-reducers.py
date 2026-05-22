@@ -32,6 +32,7 @@ def compute_summary(input_file: str, sensitivity: int) -> str:
         [
             sys.executable,
             os.path.join(ROOT, "src", "pesto", "cli.py"),
+            "trace",
             input_file,
             "-s",
             str(sensitivity),
@@ -115,7 +116,7 @@ def parse_args() -> argparse.Namespace:
 def main():
     args = parse_args()
     sensitivity = args.trace_sensitivity
-    inputs = args.inputs or sorted(glob.glob(os.path.join(ROOT, "tests", "*.py")))
+    inputs = args.inputs or sorted(glob.glob(os.path.join(ROOT, "tests/fuzzing_samples", "*.py")))
 
     if not os.path.isfile(PERSES_JAR):
         print(f"Perses jar not found: {PERSES_JAR}", file=sys.stderr)
