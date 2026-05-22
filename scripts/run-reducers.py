@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import glob
 import os
 import shutil
@@ -15,7 +16,9 @@ import tempfile
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 PERSES_JAR = os.path.join(ROOT, "perses", "perses_deploy.jar")
 TEST_SCRIPT = os.path.join(ROOT, "scripts", "test-script.sh")
+DEFAULT_INPUT_DIR = os.path.join(ROOT, "tests")
 DEFAULT_TRACE_SENSITIVITY = 10
+DEFAULT_REDUCER_JOBS = min(4, os.cpu_count() or 1)
 PERSES_THREADS = "1"
 SCRIPT_TIMEOUT_SECONDS = 60
 
@@ -25,6 +28,12 @@ def trace_sensitivity(value: str) -> int:
     if sensitivity < 0:
         raise argparse.ArgumentTypeError("trace sensitivity must be non-negative")
     return sensitivity
+
+def positive_int(value: str) -> int:
+    number = int(value)
+    if number < 1:
+        raise argparse.ArgumentTypeError("value must be at least 1")
+    return number
 
 # Run the pesto CLI on the input file to get the expected stderr summary, which is used as the oracle for reducers.
 def compute_summary(input_file: str, sensitivity: int) -> str:
@@ -106,17 +115,53 @@ def run_perses(
     shutil.copy2(reduced_file, os.path.join(results_dir, input_basename))
 
 
+def reduce_input(input_file: str, results_dir: str, sensitivity: int) -> str:
+    input_file = os.path.abspath(input_file)
+    input_basename = os.path.basename(input_file)
+    output_dir = os.path.join(results_dir, os.path.splitext(input_basename)[0])
+
+    print(f"[PESTO] reducing {input_file}", flush=True)
+    run_perses(
+        input_file=input_file,
+        results_dir=results_dir,
+        output_dir=output_dir,
+        sensitivity=sensitivity,
+    )
+    return os.path.join(results_dir, input_basename)
+
+
+def collect_inputs(args: argparse.Namespace) -> list[str]:
+    if args.inputs:
+        input_file = os.path.abspath(args.inputs)
+        if not os.path.isfile(input_file):
+            raise FileNotFoundError(f"input file not found: {input_file}")
+        return [input_file]
+
+    input_dir = os.path.abspath(args.input_dir or DEFAULT_INPUT_DIR)
+    if not os.path.isdir(input_dir):
+        raise NotADirectoryError(f"input directory not found: {input_dir}")
+
+    return sorted(glob.glob(os.path.join(input_dir, "*.py")))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Generate reduced Python programs using trace-sensitivity")
-    parser.add_argument("-i", "--inputs", nargs="+", help="Python test files to reduce. Defaults to tests/*.py.",)
+    input_group = parser.add_mutually_exclusive_group()
+    input_group.add_argument("-i", "--inputs", metavar="INPUT_FILE", help="Single Python test file to reduce.",)
+    input_group.add_argument("-d", "--dir", dest="input_dir", metavar="INPUT_DIR", help="Directory containing Python test files to reduce. Defaults to tests/.",)
     parser.add_argument("-o", "--output", required=True, help="Directory where final reduced programs are collected.",)
     parser.add_argument("-ts", "--trace-sensitivity", type=trace_sensitivity, default=DEFAULT_TRACE_SENSITIVITY, help=f"Number of trace frames to keep in summaries. Defaults to {DEFAULT_TRACE_SENSITIVITY}.",)
+    parser.add_argument("-j", "--jobs", type=positive_int, default=DEFAULT_REDUCER_JOBS, help=f"Number of input files to reduce in parallel. Defaults to {DEFAULT_REDUCER_JOBS}.",)
     return parser.parse_args()
 
 def main():
     args = parse_args()
     sensitivity = args.trace_sensitivity
-    inputs = args.inputs or sorted(glob.glob(os.path.join(ROOT, "tests/fuzzing_samples", "*.py")))
+    try:
+        inputs = collect_inputs(args)
+    except (FileNotFoundError, NotADirectoryError) as exc:
+        print(f"[PESTO] {exc}", file=sys.stderr)
+        return 2
 
     if not os.path.isfile(PERSES_JAR):
         print(f"Perses jar not found: {PERSES_JAR}", file=sys.stderr)
@@ -130,25 +175,35 @@ def main():
     results_dir = os.path.abspath(args.output)
     os.makedirs(results_dir, exist_ok=True)
 
+    if not inputs:
+        print("[PESTO] no input files to reduce", file=sys.stderr)
+        return 0
+
+    jobs = min(args.jobs, len(inputs))
+    print(f"[PESTO] reducing {len(inputs)} input(s) with {jobs} parallel job(s)", flush=True)
+
     failed = []
-    # Run reducer on each input file
-    for input_file in inputs:
-        input_file = os.path.abspath(input_file)
-        input_basename = os.path.basename(input_file)
-        output_dir = os.path.join(results_dir, os.path.splitext(input_basename)[0])
-        print(f"[PESTO] reducing {input_file}", flush=True)
-        try:
-            run_perses(
+    with ThreadPoolExecutor(max_workers=jobs) as executor:
+        future_to_input = {
+            executor.submit(
+                reduce_input,
                 input_file=input_file,
                 results_dir=results_dir,
-                output_dir=output_dir,
                 sensitivity=sensitivity,
-            )
-        except Exception as exc:
-            failed.append((input_file, str(exc)))
-            print(f"[PESTO] failed {input_basename}: {exc}", file=sys.stderr, flush=True)
-        else:
-            print(f"[PESTO] wrote {os.path.join(results_dir, input_basename)}", flush=True)
+            ): os.path.abspath(input_file)
+            for input_file in inputs
+        }
+
+        for future in as_completed(future_to_input):
+            input_file = future_to_input[future]
+            input_basename = os.path.basename(input_file)
+            try:
+                output_file = future.result()
+            except Exception as exc:
+                failed.append((input_file, str(exc)))
+                print(f"[PESTO] failed {input_basename}: {exc}", file=sys.stderr, flush=True)
+            else:
+                print(f"[PESTO] wrote {output_file}", flush=True)
 
     if failed:
         print("\n[PESTO] failures:", file=sys.stderr)

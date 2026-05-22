@@ -8,24 +8,8 @@ python3 src/pesto/cli.py trace tests/add_1.py
 python3 src/pesto/cli.py mutate test.c [-I DIR] [-m N ...]
 # mutate cpython longobject and build
 python3 src/pesto/cli.py mutate-cpython [file] [-m N ...]
-# evaluate mutation score (CPython)
-python3 src/pesto/cli.py evaluate [--sample N] [--seed N] [--timeout S] [--tests-dir DIR]
-# evaluate mutation score (arbitrary target)
-python3 src/pesto/cli.py evaluate --binary ./mutant --meta pesto_mutation/target.meta.json --tests-dir DIR
-```
-
-## Evaluating Non-CPython Targets
-
-```bash
-# 1. mutate a C file
-python3 src/pesto/cli.py mutate target.c [-I DIR] [-m N ...]
-# 2. compile the mutated binary
-gcc pesto_mutation/target.c pesto_mutation/pesto_runtime.c -o mutant
-# 3. evaluate
-python3 src/pesto/cli.py evaluate \
-  --binary ./mutant \
-  --meta pesto_mutation/target.meta.json \
-  --tests-dir ./tests
+# evaluate mutation score
+python3 src/pesto/cli.py evaluate [--sample N] [--seed N] [--timeout S]
 ```
 
 ## Running Perses Reducer
@@ -45,7 +29,13 @@ Run the reducer driver from the project root:
 python3 scripts/run-reducers.py -o [RESULTS_DIR]
 ```
 
-You can also run the reducer on a specific input file:
+You can also run the reducer on all Python files in a specific directory:
+
+```bash
+python3 scripts/run-reducers.py -d [INPUT_DIR] -o [RESULTS_DIR]
+```
+
+You can also run the reducer on one specific input file:
 
 ```bash
 python3 scripts/run-reducers.py -i [INPUT_PYTHON_PROGRAM] -o [RESULTS_DIR]
@@ -55,4 +45,10 @@ You can also specify the trace sensitivity (default is 10):
 
 ```bash
 python3 scripts/run-reducers.py -i [INPUT_PYTHON_PROGRAM] -o [RESULTS_DIR] -ts [TRACE_SENSITIVITY]
+```
+
+You can also control how many input files are reduced in parallel:
+
+```bash
+python3 scripts/run-reducers.py -o [RESULTS_DIR] -j [JOBS]
 ```
