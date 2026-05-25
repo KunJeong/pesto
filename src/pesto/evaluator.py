@@ -152,7 +152,7 @@ def run_evaluation(sample=None, seed=42, timeout=10.0, tests_dir=None, binary=No
         "per_mutant": {str(k): v for k, v in per_mutant.items()},
     }
 
-    output = PROJECT_ROOT / "result.json"
+    output = _tests_dir / "result.json"
     output.write_text(json.dumps(results, indent=2))
     print(f"\nResults saved to {output}")
 
