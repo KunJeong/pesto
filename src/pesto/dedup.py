@@ -1,31 +1,27 @@
-#!/usr/bin/env python3
-import argparse
+"""Deduplicate programs, keeping one representative per unique AST."""
+
 import ast
 import shutil
 import sys
 from pathlib import Path
 
 
-def ast_signature(source):
+def ast_signature(source: str) -> str:
     tree = ast.parse(source)
     return ast.dump(tree, annotate_fields=True, include_attributes=False)
 
 
-def parse_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-i", "--input-dir", default="reduced")
-    parser.add_argument("-o", "--output-dir", default="dedup")
-    parser.add_argument("--pattern", default="*.py")
-    return parser.parse_args()
+def dedup(input_dir, output_dir, pattern: str = "*.py") -> int:
+    """Copy unique-by-AST files from ``input_dir`` to ``output_dir``.
 
-
-def main():
-    args = parse_args()
-    input_dir = Path(args.input_dir)
-    output_dir = Path(args.output_dir)
+    Returns a process-style exit code (0 on success).
+    """
+    input_dir = Path(input_dir)
+    output_dir = Path(output_dir)
 
     if not input_dir.is_dir():
-        sys.exit(f"input directory not found: {input_dir}")
+        print(f"input directory not found: {input_dir}", file=sys.stderr)
+        return 2
 
     output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -33,7 +29,7 @@ def main():
     duplicates = []
     failed = []
 
-    for path in sorted(input_dir.glob(args.pattern)):
+    for path in sorted(input_dir.glob(pattern)):
         if not path.is_file():
             continue
         try:
@@ -59,6 +55,4 @@ def main():
         for path, message in failed:
             print(f"  {path.name}: {message}", file=sys.stderr)
 
-
-if __name__ == "__main__":
-    main()
+    return 0

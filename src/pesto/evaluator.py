@@ -7,8 +7,9 @@ from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-LONGOBJECT_META = PROJECT_ROOT / "vendor" / "cpython" / "pesto.json"
+from . import paths
+
+LONGOBJECT_META = paths.LONGOBJECT_META
 
 
 def _exception_type(stderr):
@@ -53,8 +54,8 @@ def is_killed(baseline, result):
     return False
 
 
-LONGOBJECT_PYTHON = PROJECT_ROOT / "vendor" / "cpython" / "python"
-TESTS_DIR = PROJECT_ROOT / "tests"
+LONGOBJECT_PYTHON = paths.PATCHED_PYTHON
+TESTS_DIR = paths.DEFAULT_TESTS_DIR
 
 
 def _evaluate_mutant(python_exe, test_files, baselines, mutation_info, mid, timeout):
