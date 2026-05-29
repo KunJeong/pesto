@@ -117,9 +117,9 @@ example:
 PyNumber_Add Objects/abstract.c
 ```
 
-The extractor uses the first `[PESTO-BEGIN type=TypeError]` block after line
-4365, takes call trace index `2`, deduplicates function names, and writes
-unresolved locations as `TODO`.
+The extractor uses the first `[PESTO-BEGIN type=TypeError]` block after the
+same trace skip offset as `tracer.py`, takes call trace index `2`, deduplicates
+function names, and writes unresolved locations as `TODO`.
 
 Example with the current inspection data:
 

@@ -4,12 +4,18 @@ import re
 import sys
 from pathlib import Path
 
-BEGIN_MARKER = "[PESTO-BEGIN type=TypeError]"
-END_MARKER = "[PESTO-END]"
-START_AFTER_LINE = 4365
+# Allow running as ``python src/pesto/scripts/build_functions_list.py``.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from pesto import paths, tracer
+
 TRACE_INDEX = 2
-TRACE_RE = re.compile(r"^\s*(\d+)\s+\S+\s+0x[0-9a-fA-F]+\s+(\S+)\s+\+")
 SOURCE_DIRS = ("Objects", "Python", "Modules", "Include")
+TYPEERROR_BLOCK_RE = re.compile(
+    r"\[PESTO-BEGIN type=TypeError\](.*?)\[PESTO-END\]",
+    re.DOTALL,
+)
 
 
 def parse_args() -> argparse.Namespace:
@@ -34,25 +40,20 @@ def parse_args() -> argparse.Namespace:
 
 
 def extract_trace_function(log_path: Path) -> str | None:
-    in_target_block = False
+    lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
+    traces = "\n".join(lines[tracer._TRACE_SKIP:])
+    matches = TYPEERROR_BLOCK_RE.findall(traces)
+    if not matches:
+        return None
 
-    with log_path.open(encoding="utf-8", errors="replace") as log_file:
-        for line_no, line in enumerate(log_file, start=1):
-            stripped = line.strip()
-
-            if not in_target_block:
-                if line_no > START_AFTER_LINE and stripped == BEGIN_MARKER:
-                    in_target_block = True
-                continue
-
-            if stripped == END_MARKER:
-                return None
-
-            match = TRACE_RE.match(line)
-            if match and int(match.group(1)) == TRACE_INDEX:
-                return match.group(2)
-
-    return None
+    frames = [
+        frame
+        for line in matches[0].strip().splitlines()
+        if (frame := tracer.extract_frame(line)) is not None
+    ]
+    if len(frames) <= TRACE_INDEX:
+        return None
+    return frames[TRACE_INDEX]
 
 
 def source_files(cpython_root: Path) -> list[tuple[Path, Path, list[str]]]:
@@ -135,8 +136,7 @@ def find_source_path(
 
 def main() -> None:
     args = parse_args()
-    repo_root = Path(__file__).resolve().parents[3]
-    cpython_root = repo_root / "vendor" / "cpython"
+    cpython_root = paths.VENDOR_CPYTHON
     input_dir = args.input_dir.resolve()
     output_dir = args.output_dir.resolve()
 
