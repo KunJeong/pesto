@@ -164,19 +164,30 @@ def cmd_mutate_cpython(args: argparse.Namespace):
             f"\n{mutated_obj}: {mutated_src}\n"
             f"\t$(CC) $(filter-out -O%,$(PY_CORE_CFLAGS)) -O0 -c -o $@ $<\n"
         )
+    pesto_build_entry = (
+        f"\n.PHONY: pesto-build\n"
+        f"pesto-build: {runtime_obj} {mutated_obj}\n"
+        f"\t$(AR) r $(BLDLIBRARY) {runtime_obj} {mutated_obj}\n"
+        f"\t$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $(BUILDPYTHON)"
+        f" Programs/python.o $(LINK_PYTHON_OBJS) $(LIBS) $(MODLIBS) $(SYSLIBS)\n"
+    )
+    if pesto_build_entry not in content:
+        if "pesto-build:" in content:
+            import re as _re
+            content = _re.sub(
+                r"\n\.PHONY: pesto-build\npesto-build:.*?\n\t.*?\n\t.*?\n",
+                "",
+                content,
+            )
+            makefile.write_text(content)
+        additions += pesto_build_entry
     if additions:
         makefile.write_text(content + additions)
         print("Patched Makefile.")
 
-    subprocess.run(
-        ["make", "-C", str(PATCHED_CPYTHON_ROOT), runtime_obj],
-        check=True,
-        capture_output=True,
-    )
-
     print(f"Building mutated CPython ...")
     result = subprocess.run(
-        ["make", "-C", str(PATCHED_CPYTHON_ROOT), f"-j{os.cpu_count() or 4}", "python"],
+        ["make", "-C", str(PATCHED_CPYTHON_ROOT), f"-j{os.cpu_count() or 4}", "pesto-build"],
     )
     if result.returncode == 0:
         print(f"\nBuild complete: {PATCHED_CPYTHON_ROOT}/python")
