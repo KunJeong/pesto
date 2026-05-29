@@ -4,10 +4,16 @@ import subprocess
 import sys
 from pathlib import Path
 
+# Allow running as ``python src/pesto/scripts/capture_python_logs.py``.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+from pesto import paths
+
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run Python files with vendor/cpython/python.exe and save logs."
+        description="Run Python files with the patched CPython and save logs."
     )
     parser.add_argument(
         "-i",
@@ -28,8 +34,8 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    repo_root = Path(__file__).resolve().parents[3]
-    python = repo_root / "vendor" / "cpython" / "python.exe"
+    repo_root = paths.PROJECT_ROOT
+    python = paths.PATCHED_PYTHON
     input_dir = args.input_dir.resolve()
     output_dir = args.output_dir.resolve()
 
