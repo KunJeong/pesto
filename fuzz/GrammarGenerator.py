@@ -10,11 +10,11 @@ class GrammarGenerator(Generator):
     def file(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'file', parent) as rule:
             current = rule.current
-            self.program(parent=current)
+            self.prog(parent=current)
         return current
 
-    def program(self, parent: ParentRule | None = None) -> Rule:
-        with UnparserRuleContext(self, 'program', parent) as rule:
+    def prog(self, parent: ParentRule | None = None) -> Rule:
+        with UnparserRuleContext(self, 'prog', parent) as rule:
             current = rule.current
             with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[0], 0, GrammarGenerator._alt_conds[0]) as alt0:
                 current = rule.current
@@ -386,8 +386,8 @@ class GrammarGenerator(Generator):
             self.T__37(parent=current)
         return current
 
-    def regex_setup(self, parent: ParentRule | None = None) -> Rule:
-        with UnparserRuleContext(self, 'regex_setup', parent) as rule:
+    def path_setup(self, parent: ParentRule | None = None) -> Rule:
+        with UnparserRuleContext(self, 'path_setup', parent) as rule:
             current = rule.current
             self._reserve(8, self.T__38, parent=current)
             self._reserve(7, self.NL, parent=current)
@@ -400,101 +400,75 @@ class GrammarGenerator(Generator):
             self.T__42(parent=current)
         return current
 
-    def json_setup(self, parent: ParentRule | None = None) -> Rule:
-        with UnparserRuleContext(self, 'json_setup', parent) as rule:
-            current = rule.current
-            self._reserve(8, self.T__43, parent=current)
-            self._reserve(7, self.NL, parent=current)
-            self._reserve(6, self.T__44, parent=current)
-            self._reserve(5, self.NL, parent=current)
-            self._reserve(4, self.T__45, parent=current)
-            self._reserve(3, self.NL, parent=current)
-            self._reserve(2, self.T__46, parent=current)
-            self._reserve(1, self.NL, parent=current)
-            self.T__47(parent=current)
-        return current
-
-    def path_setup(self, parent: ParentRule | None = None) -> Rule:
-        with UnparserRuleContext(self, 'path_setup', parent) as rule:
-            current = rule.current
-            self._reserve(8, self.T__48, parent=current)
-            self._reserve(7, self.NL, parent=current)
-            self._reserve(6, self.T__49, parent=current)
-            self._reserve(5, self.NL, parent=current)
-            self._reserve(4, self.T__50, parent=current)
-            self._reserve(3, self.NL, parent=current)
-            self._reserve(2, self.T__51, parent=current)
-            self._reserve(1, self.NL, parent=current)
-            self.T__52(parent=current)
-        return current
-
     def deque_setup(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'deque_setup', parent) as rule:
             current = rule.current
-            self._reserve(12, self.T__53, parent=current)
+            self._reserve(12, self.T__43, parent=current)
             self._reserve(11, self.NL, parent=current)
-            self._reserve(10, self.T__54, parent=current)
+            self._reserve(10, self.T__44, parent=current)
             self._reserve(9, self.num_lit, parent=current)
             self._reserve(8, self.T__5, parent=current)
             self._reserve(7, self.num_lit, parent=current)
-            self._reserve(6, self.T__55, parent=current)
+            self._reserve(6, self.T__45, parent=current)
             self._reserve(5, self.NL, parent=current)
-            self._reserve(4, self.T__56, parent=current)
+            self._reserve(4, self.T__46, parent=current)
             self._reserve(3, self.NL, parent=current)
-            self._reserve(2, self.T__57, parent=current)
+            self._reserve(2, self.T__47, parent=current)
             self._reserve(1, self.NL, parent=current)
-            self.T__58(parent=current)
+            self.T__48(parent=current)
         return current
 
     def mixed_setup(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'mixed_setup', parent) as rule:
             current = rule.current
-            self._reserve(45, self.T__0, parent=current)
-            self._reserve(44, self.NL, parent=current)
-            self._reserve(43, self.T__3, parent=current)
-            self._reserve(42, self.bool_lit, parent=current)
-            self._reserve(41, self.NL, parent=current)
-            self._reserve(40, self.T__1, parent=current)
-            self._reserve(39, self.num_lit, parent=current)
-            self._reserve(38, self.NL, parent=current)
-            self._reserve(37, self.T__9, parent=current)
-            self._reserve(36, self.str_lit, parent=current)
-            self._reserve(35, self.NL, parent=current)
-            self._reserve(34, self.T__4, parent=current)
+            self._reserve(47, self.T__0, parent=current)
+            self._reserve(46, self.NL, parent=current)
+            self._reserve(45, self.T__3, parent=current)
+            self._reserve(44, self.bool_lit, parent=current)
+            self._reserve(43, self.NL, parent=current)
+            self._reserve(42, self.T__1, parent=current)
+            self._reserve(41, self.num_lit, parent=current)
+            self._reserve(40, self.NL, parent=current)
+            self._reserve(39, self.T__9, parent=current)
+            self._reserve(38, self.str_lit, parent=current)
+            self._reserve(37, self.NL, parent=current)
+            self._reserve(36, self.T__4, parent=current)
+            self._reserve(35, self.pos_num_lit, parent=current)
+            self._reserve(34, self.T__5, parent=current)
             self._reserve(33, self.pos_num_lit, parent=current)
             self._reserve(32, self.T__5, parent=current)
             self._reserve(31, self.pos_num_lit, parent=current)
-            self._reserve(30, self.T__5, parent=current)
-            self._reserve(29, self.pos_num_lit, parent=current)
-            self._reserve(28, self.T__6, parent=current)
-            self._reserve(27, self.NL, parent=current)
-            self._reserve(26, self.T__14, parent=current)
-            self._reserve(25, self.key_lit, parent=current)
-            self._reserve(24, self.T__15, parent=current)
-            self._reserve(23, self.num_lit, parent=current)
-            self._reserve(22, self.T__5, parent=current)
-            self._reserve(21, self.key_lit, parent=current)
-            self._reserve(20, self.T__15, parent=current)
-            self._reserve(19, self.num_lit, parent=current)
-            self._reserve(18, self.T__16, parent=current)
+            self._reserve(30, self.T__6, parent=current)
+            self._reserve(29, self.NL, parent=current)
+            self._reserve(28, self.T__14, parent=current)
+            self._reserve(27, self.key_lit, parent=current)
+            self._reserve(26, self.T__15, parent=current)
+            self._reserve(25, self.num_lit, parent=current)
+            self._reserve(24, self.T__5, parent=current)
+            self._reserve(23, self.key_lit, parent=current)
+            self._reserve(22, self.T__15, parent=current)
+            self._reserve(21, self.num_lit, parent=current)
+            self._reserve(20, self.T__16, parent=current)
+            self._reserve(19, self.NL, parent=current)
+            self._reserve(18, self.T__11, parent=current)
             self._reserve(17, self.NL, parent=current)
-            self._reserve(16, self.T__11, parent=current)
+            self._reserve(16, self.T__20, parent=current)
             self._reserve(15, self.NL, parent=current)
-            self._reserve(14, self.T__20, parent=current)
+            self._reserve(14, self.T__49, parent=current)
             self._reserve(13, self.NL, parent=current)
-            self._reserve(12, self.T__59, parent=current)
+            self._reserve(12, self.T__50, parent=current)
             self._reserve(11, self.NL, parent=current)
-            self._reserve(10, self.T__60, parent=current)
+            self._reserve(10, self.T__51, parent=current)
             self._reserve(9, self.NL, parent=current)
-            self._reserve(8, self.T__61, parent=current)
+            self._reserve(8, self.T__52, parent=current)
             self._reserve(7, self.NL, parent=current)
-            self._reserve(6, self.T__62, parent=current)
+            self._reserve(6, self.T__53, parent=current)
             self._reserve(5, self.NL, parent=current)
-            self._reserve(4, self.T__63, parent=current)
+            self._reserve(4, self.T__7, parent=current)
             self._reserve(3, self.NL, parent=current)
-            self._reserve(2, self.T__7, parent=current)
+            self._reserve(2, self.T__54, parent=current)
             self._reserve(1, self.NL, parent=current)
-            self.T__64(parent=current)
+            self.T__55(parent=current)
         return current
 
     def math_step(self, parent: ParentRule | None = None) -> Rule:
@@ -504,31 +478,31 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
-                    self._reserve(4, self.T__65, parent=current)
+                    self._reserve(4, self.T__56, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__66, parent=current)
+                    self._reserve(2, self.T__57, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__67(parent=current)
+                    self.T__58(parent=current)
                 elif choice0 == 1:
-                    self._reserve(2, self.T__68, parent=current)
+                    self._reserve(2, self.T__59, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__69(parent=current)
+                    self.T__60(parent=current)
                 elif choice0 == 2:
-                    self._reserve(6, self.T__70, parent=current)
+                    self._reserve(6, self.T__61, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__71, parent=current)
+                    self._reserve(4, self.T__62, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__73(parent=current)
+                    self.T__64(parent=current)
                 elif choice0 == 3:
-                    self._reserve(2, self.T__74, parent=current)
+                    self._reserve(2, self.T__65, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__75(parent=current)
+                    self.T__66(parent=current)
                 elif choice0 == 4:
-                    self._reserve(2, self.T__76, parent=current)
+                    self._reserve(2, self.T__67, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__77(parent=current)
+                    self.T__68(parent=current)
             current = rule.current
         return current
 
@@ -539,29 +513,29 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
+                    self._reserve(2, self.T__69, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__70(parent=current)
+                elif choice0 == 1:
+                    self._reserve(6, self.T__71, parent=current)
+                    self._reserve(5, self.NL, parent=current)
+                    self._reserve(4, self.T__72, parent=current)
+                    self._reserve(3, self.NL, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__73(parent=current)
+                elif choice0 == 2:
+                    self._reserve(2, self.T__74, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__75(parent=current)
+                elif choice0 == 3:
+                    self._reserve(2, self.T__76, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__77(parent=current)
+                elif choice0 == 4:
                     self._reserve(2, self.T__78, parent=current)
                     self._reserve(1, self.NL, parent=current)
                     self.T__79(parent=current)
-                elif choice0 == 1:
-                    self._reserve(6, self.T__80, parent=current)
-                    self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__81, parent=current)
-                    self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__82(parent=current)
-                elif choice0 == 2:
-                    self._reserve(2, self.T__83, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__84(parent=current)
-                elif choice0 == 3:
-                    self._reserve(2, self.T__85, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__86(parent=current)
-                elif choice0 == 4:
-                    self._reserve(2, self.T__87, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__88(parent=current)
             current = rule.current
         return current
 
@@ -572,29 +546,29 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
+                    self._reserve(2, self.T__80, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__81(parent=current)
+                elif choice0 == 1:
+                    self._reserve(2, self.T__82, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__83(parent=current)
+                elif choice0 == 2:
+                    self._reserve(6, self.T__84, parent=current)
+                    self._reserve(5, self.NL, parent=current)
+                    self._reserve(4, self.T__85, parent=current)
+                    self._reserve(3, self.NL, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__86(parent=current)
+                elif choice0 == 3:
+                    self._reserve(2, self.T__87, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__88(parent=current)
+                elif choice0 == 4:
                     self._reserve(2, self.T__89, parent=current)
                     self._reserve(1, self.NL, parent=current)
                     self.T__90(parent=current)
-                elif choice0 == 1:
-                    self._reserve(2, self.T__91, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__92(parent=current)
-                elif choice0 == 2:
-                    self._reserve(6, self.T__93, parent=current)
-                    self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__94, parent=current)
-                    self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__95(parent=current)
-                elif choice0 == 3:
-                    self._reserve(2, self.T__96, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__97(parent=current)
-                elif choice0 == 4:
-                    self._reserve(2, self.T__98, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__99(parent=current)
             current = rule.current
         return current
 
@@ -605,30 +579,30 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
+                    self._reserve(2, self.T__91, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__92(parent=current)
+                elif choice0 == 1:
+                    self._reserve(3, self.T__93, parent=current)
+                    self._reserve(2, self.num_lit, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__94(parent=current)
+                elif choice0 == 2:
+                    self._reserve(6, self.T__95, parent=current)
+                    self._reserve(5, self.NL, parent=current)
+                    self._reserve(4, self.T__96, parent=current)
+                    self._reserve(3, self.NL, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__97(parent=current)
+                elif choice0 == 3:
+                    self._reserve(2, self.T__98, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__99(parent=current)
+                elif choice0 == 4:
                     self._reserve(2, self.T__100, parent=current)
                     self._reserve(1, self.NL, parent=current)
                     self.T__101(parent=current)
-                elif choice0 == 1:
-                    self._reserve(3, self.T__102, parent=current)
-                    self._reserve(2, self.num_lit, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__103(parent=current)
-                elif choice0 == 2:
-                    self._reserve(6, self.T__104, parent=current)
-                    self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__105, parent=current)
-                    self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__106(parent=current)
-                elif choice0 == 3:
-                    self._reserve(2, self.T__107, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__108(parent=current)
-                elif choice0 == 4:
-                    self._reserve(2, self.T__109, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__110(parent=current)
             current = rule.current
         return current
 
@@ -639,29 +613,29 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
+                    self._reserve(2, self.T__102, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__103(parent=current)
+                elif choice0 == 1:
+                    self._reserve(2, self.T__104, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__105(parent=current)
+                elif choice0 == 2:
+                    self._reserve(2, self.T__106, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__107(parent=current)
+                elif choice0 == 3:
+                    self._reserve(6, self.T__108, parent=current)
+                    self._reserve(5, self.NL, parent=current)
+                    self._reserve(4, self.T__109, parent=current)
+                    self._reserve(3, self.NL, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__110(parent=current)
+                elif choice0 == 4:
                     self._reserve(2, self.T__111, parent=current)
                     self._reserve(1, self.NL, parent=current)
                     self.T__112(parent=current)
-                elif choice0 == 1:
-                    self._reserve(2, self.T__113, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__114(parent=current)
-                elif choice0 == 2:
-                    self._reserve(2, self.T__115, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__116(parent=current)
-                elif choice0 == 3:
-                    self._reserve(6, self.T__117, parent=current)
-                    self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__118, parent=current)
-                    self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__119(parent=current)
-                elif choice0 == 4:
-                    self._reserve(2, self.T__120, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__121(parent=current)
             current = rule.current
         return current
 
@@ -672,29 +646,29 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
-                    self._reserve(2, self.T__122, parent=current)
+                    self._reserve(2, self.T__113, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__114(parent=current)
+                elif choice0 == 1:
+                    self._reserve(2, self.T__115, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__116(parent=current)
+                elif choice0 == 2:
+                    self._reserve(2, self.T__117, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__118(parent=current)
+                elif choice0 == 3:
+                    self._reserve(2, self.T__119, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__120(parent=current)
+                elif choice0 == 4:
+                    self._reserve(6, self.T__121, parent=current)
+                    self._reserve(5, self.NL, parent=current)
+                    self._reserve(4, self.T__122, parent=current)
+                    self._reserve(3, self.NL, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
                     self._reserve(1, self.NL, parent=current)
                     self.T__123(parent=current)
-                elif choice0 == 1:
-                    self._reserve(2, self.T__124, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__125(parent=current)
-                elif choice0 == 2:
-                    self._reserve(2, self.T__126, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__127(parent=current)
-                elif choice0 == 3:
-                    self._reserve(2, self.T__128, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__129(parent=current)
-                elif choice0 == 4:
-                    self._reserve(6, self.T__130, parent=current)
-                    self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__131, parent=current)
-                    self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__132(parent=current)
             current = rule.current
         return current
 
@@ -705,21 +679,21 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
-                    self._reserve(2, self.T__133, parent=current)
+                    self._reserve(2, self.T__124, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__134(parent=current)
+                    self.T__125(parent=current)
                 elif choice0 == 1:
-                    self._reserve(2, self.T__135, parent=current)
+                    self._reserve(2, self.T__126, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__136(parent=current)
+                    self.T__127(parent=current)
                 elif choice0 == 2:
-                    self._reserve(2, self.T__137, parent=current)
+                    self._reserve(2, self.T__128, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__138(parent=current)
+                    self.T__129(parent=current)
                 elif choice0 == 3:
-                    self._reserve(2, self.T__139, parent=current)
+                    self._reserve(2, self.T__130, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__140(parent=current)
+                    self.T__131(parent=current)
                 elif choice0 == 4:
                     self.T__12(parent=current)
             current = rule.current
@@ -732,11 +706,46 @@ class GrammarGenerator(Generator):
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
-                    self._reserve(4, self.T__141, parent=current)
+                    self._reserve(4, self.T__132, parent=current)
                     self._reserve(3, self.num_lit, parent=current)
                     self._reserve(2, self.T__26, parent=current)
                     self._reserve(1, self.NL, parent=current)
+                    self.T__133(parent=current)
+                elif choice0 == 1:
+                    self._reserve(2, self.T__134, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__135(parent=current)
+                elif choice0 == 2:
+                    self._reserve(2, self.T__136, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__137(parent=current)
+                elif choice0 == 3:
+                    self._reserve(6, self.T__138, parent=current)
+                    self._reserve(5, self.NL, parent=current)
+                    self._reserve(4, self.T__139, parent=current)
+                    self._reserve(3, self.NL, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__140(parent=current)
+                elif choice0 == 4:
+                    self._reserve(2, self.T__141, parent=current)
+                    self._reserve(1, self.NL, parent=current)
                     self.T__142(parent=current)
+            current = rule.current
+        return current
+
+    def mixed_step(self, parent: ParentRule | None = None) -> Rule:
+        with UnparserRuleContext(self, 'mixed_step', parent) as rule:
+            current = rule.current
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[9], 0, GrammarGenerator._alt_conds[1]) as alt0:
+                current = rule.current
+                choice0 = alt0()
+                if choice0 == 0:
+                    self._reserve(4, self.T__56, parent=current)
+                    self._reserve(3, self.NL, parent=current)
+                    self._reserve(2, self.T__57, parent=current)
+                    self._reserve(1, self.NL, parent=current)
+                    self.T__58(parent=current)
                 elif choice0 == 1:
                     self._reserve(2, self.T__143, parent=current)
                     self._reserve(1, self.NL, parent=current)
@@ -750,44 +759,9 @@ class GrammarGenerator(Generator):
                     self._reserve(5, self.NL, parent=current)
                     self._reserve(4, self.T__148, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
+                    self._reserve(2, self.T__63, parent=current)
                     self._reserve(1, self.NL, parent=current)
                     self.T__149(parent=current)
-                elif choice0 == 4:
-                    self._reserve(2, self.T__150, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__151(parent=current)
-            current = rule.current
-        return current
-
-    def mixed_step(self, parent: ParentRule | None = None) -> Rule:
-        with UnparserRuleContext(self, 'mixed_step', parent) as rule:
-            current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[9], 0, GrammarGenerator._alt_conds[1]) as alt0:
-                current = rule.current
-                choice0 = alt0()
-                if choice0 == 0:
-                    self._reserve(4, self.T__65, parent=current)
-                    self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__66, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__67(parent=current)
-                elif choice0 == 1:
-                    self._reserve(2, self.T__152, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__153(parent=current)
-                elif choice0 == 2:
-                    self._reserve(2, self.T__154, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__155(parent=current)
-                elif choice0 == 3:
-                    self._reserve(6, self.T__156, parent=current)
-                    self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__157, parent=current)
-                    self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__72, parent=current)
-                    self._reserve(1, self.NL, parent=current)
-                    self.T__158(parent=current)
                 elif choice0 == 4:
                     self.T__8(parent=current)
             current = rule.current
@@ -814,9 +788,9 @@ class GrammarGenerator(Generator):
                 if choice0 == 0:
                     self.wrap_collection_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(2, self.T__159, parent=current)
+                    self._reserve(2, self.T__150, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__59(parent=current)
+                    self.T__49(parent=current)
             current = rule.current
         return current
 
@@ -829,9 +803,9 @@ class GrammarGenerator(Generator):
                 if choice0 == 0:
                     self.wrap_object_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(2, self.T__160, parent=current)
+                    self._reserve(2, self.T__151, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__59(parent=current)
+                    self.T__49(parent=current)
             current = rule.current
         return current
 
@@ -856,26 +830,23 @@ class GrammarGenerator(Generator):
     def deque_bad_site(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'deque_bad_site', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[11], 0, GrammarGenerator._alt_conds[2]) as alt0:
-                current = rule.current
-                [self.wrap_deque_expr, self.T__161][alt0()](parent=current)
-            current = rule.current
+            self.wrap_deque_expr(parent=current)
         return current
 
     def mixed_bad_site(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'mixed_bad_site', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[2]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[11], 0, GrammarGenerator._alt_conds[2]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.wrap_mixed_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(4, self.T__162, parent=current)
+                    self._reserve(4, self.T__152, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__163, parent=current)
+                    self._reserve(2, self.T__153, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__164(parent=current)
+                    self.T__154(parent=current)
             current = rule.current
         return current
 
@@ -936,558 +907,558 @@ class GrammarGenerator(Generator):
     def wrap_math_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_math_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.math_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.math_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.math_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.math_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.math_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.math_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.math_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.math_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_text_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_text_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.text_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.text_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.text_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.text_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.text_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.text_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.text_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.text_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_collection_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_collection_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.collection_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.collection_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.collection_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.collection_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.collection_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.collection_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.collection_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.collection_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_object_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_object_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.object_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.object_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.object_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.object_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.object_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.object_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.object_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.object_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_bytes_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_bytes_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.bytes_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.bytes_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.bytes_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.bytes_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.bytes_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.bytes_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.bytes_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.bytes_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_convert_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_convert_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.convert_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.convert_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.convert_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.convert_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.convert_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.convert_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.convert_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.convert_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_path_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_path_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.path_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.path_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.path_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.path_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.path_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.path_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.path_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.path_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_deque_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_deque_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.deque_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.deque_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.deque_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.deque_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.deque_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.deque_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.deque_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.deque_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def wrap_mixed_base(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'wrap_mixed_base', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[12], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
                 choice0 = alt0()
                 if choice0 == 0:
                     self.mixed_bad_expr(parent=current)
                 elif choice0 == 1:
-                    self._reserve(1, self.T__165, parent=current)
+                    self._reserve(1, self.T__155, parent=current)
                     self.mixed_bad_expr(parent=current)
                 elif choice0 == 2:
-                    self._reserve(3, self.T__166, parent=current)
+                    self._reserve(3, self.T__156, parent=current)
                     self._reserve(2, self.NL, parent=current)
-                    self._reserve(1, self.T__167, parent=current)
+                    self._reserve(1, self.T__157, parent=current)
                     self.mixed_bad_expr(parent=current)
                 elif choice0 == 3:
-                    self._reserve(3, self.T__168, parent=current)
+                    self._reserve(3, self.T__158, parent=current)
                     self._reserve(2, self.mixed_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__169(parent=current)
+                    self.T__159(parent=current)
                 elif choice0 == 4:
-                    self._reserve(5, self.T__170, parent=current)
+                    self._reserve(5, self.T__160, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__171, parent=current)
+                    self._reserve(3, self.T__161, parent=current)
                     self._reserve(2, self.mixed_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__172(parent=current)
+                    self.T__162(parent=current)
                 elif choice0 == 5:
-                    self._reserve(9, self.T__173, parent=current)
+                    self._reserve(9, self.T__163, parent=current)
                     self._reserve(8, self.NL, parent=current)
-                    self._reserve(7, self.T__171, parent=current)
+                    self._reserve(7, self.T__161, parent=current)
                     self._reserve(6, self.mixed_bad_expr, parent=current)
                     self._reserve(5, self.NL, parent=current)
-                    self._reserve(4, self.T__174, parent=current)
+                    self._reserve(4, self.T__164, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__175, parent=current)
+                    self._reserve(2, self.T__165, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__176(parent=current)
+                    self.T__166(parent=current)
                 elif choice0 == 6:
-                    self._reserve(7, self.T__177, parent=current)
+                    self._reserve(7, self.T__167, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__178, parent=current)
+                    self._reserve(5, self.T__168, parent=current)
                     self._reserve(4, self.NL, parent=current)
-                    self._reserve(3, self.T__179, parent=current)
+                    self._reserve(3, self.T__169, parent=current)
                     self._reserve(2, self.mixed_bad_expr, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__180(parent=current)
+                    self.T__170(parent=current)
                 elif choice0 == 7:
-                    self._reserve(7, self.T__181, parent=current)
+                    self._reserve(7, self.T__171, parent=current)
                     self._reserve(6, self.NL, parent=current)
-                    self._reserve(5, self.T__167, parent=current)
+                    self._reserve(5, self.T__157, parent=current)
                     self._reserve(4, self.mixed_bad_expr, parent=current)
                     self._reserve(3, self.NL, parent=current)
-                    self._reserve(2, self.T__182, parent=current)
+                    self._reserve(2, self.T__172, parent=current)
                     self._reserve(1, self.NL, parent=current)
-                    self.T__183(parent=current)
+                    self.T__173(parent=current)
             current = rule.current
         return current
 
     def math_bad_expr(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'math_bad_expr', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[14], 0, GrammarGenerator._alt_conds[4]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[13], 0, GrammarGenerator._alt_conds[4]) as alt0:
                 current = rule.current
-                [self.T__184, self.T__185, self.T__186, self.T__187, self.T__188, self.T__189, self.T__190, self.T__191, self.T__192, self.T__193][alt0()](parent=current)
+                [self.T__174, self.T__175, self.T__176, self.T__177, self.T__178, self.T__179, self.T__180, self.T__181, self.T__182, self.T__183, self.T__184, self.T__185, self.T__186, self.T__187, self.T__188, self.T__189, self.T__190, self.T__191, self.T__192, self.T__193, self.T__194, self.T__195, self.T__196, self.T__197, self.T__198, self.T__199, self.T__200, self.T__201, self.T__202][alt0()](parent=current)
             current = rule.current
         return current
 
     def text_bad_expr(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'text_bad_expr', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[14], 0, GrammarGenerator._alt_conds[4]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[14], 0, GrammarGenerator._alt_conds[3]) as alt0:
                 current = rule.current
-                [self.T__194, self.T__195, self.T__196, self.T__197, self.T__198, self.T__199, self.T__200, self.T__201, self.T__202, self.T__203][alt0()](parent=current)
+                [self.T__203, self.T__204, self.T__205, self.T__206, self.T__207, self.T__208, self.T__209, self.T__210][alt0()](parent=current)
             current = rule.current
         return current
 
@@ -1496,7 +1467,7 @@ class GrammarGenerator(Generator):
             current = rule.current
             with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[15], 0, GrammarGenerator._alt_conds[5]) as alt0:
                 current = rule.current
-                [self.T__204, self.T__205, self.T__206, self.T__207, self.T__208, self.T__209, self.T__210, self.T__211, self.T__212, self.T__213, self.T__214, self.T__215, self.T__216, self.T__217][alt0()](parent=current)
+                [self.T__211, self.T__212, self.T__213, self.T__214, self.T__215, self.T__216, self.T__217, self.T__218, self.T__219, self.T__220, self.T__221, self.T__202, self.T__222, self.T__223, self.T__224, self.T__225, self.T__226, self.T__227, self.T__228, self.T__229, self.T__230, self.T__231, self.T__232][alt0()](parent=current)
             current = rule.current
         return current
 
@@ -1505,133 +1476,133 @@ class GrammarGenerator(Generator):
             current = rule.current
             with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[16], 0, GrammarGenerator._alt_conds[6]) as alt0:
                 current = rule.current
-                [self.T__218, self.T__219, self.T__220, self.T__221, self.T__222, self.T__223, self.T__224][alt0()](parent=current)
+                [self.T__233, self.T__234, self.T__235, self.T__236, self.T__237, self.T__238, self.T__239][alt0()](parent=current)
             current = rule.current
         return current
 
     def bytes_bad_expr(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'bytes_bad_expr', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[17], 0, GrammarGenerator._alt_conds[3]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[17], 0, GrammarGenerator._alt_conds[7]) as alt0:
                 current = rule.current
-                [self.T__225, self.T__226, self.T__227, self.T__228, self.T__229, self.T__201, self.T__202, self.T__203][alt0()](parent=current)
+                [self.T__240, self.T__241, self.T__242, self.T__243, self.T__244, self.T__210][alt0()](parent=current)
             current = rule.current
         return current
 
     def convert_bad_expr(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'convert_bad_expr', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[18], 0, GrammarGenerator._alt_conds[7]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[18], 0, GrammarGenerator._alt_conds[8]) as alt0:
                 current = rule.current
-                [self.T__230, self.T__231, self.T__232, self.T__233, self.T__234, self.T__235, self.T__236, self.T__237, self.T__238, self.T__239, self.T__240, self.T__241, self.T__242, self.T__216, self.T__217][alt0()](parent=current)
+                [self.T__245, self.T__246, self.T__247, self.T__248, self.T__249, self.T__250, self.T__251, self.T__252, self.T__253, self.T__190, self.T__254, self.T__255, self.T__256, self.T__257, self.T__231, self.T__232][alt0()](parent=current)
             current = rule.current
         return current
 
     def path_bad_expr(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'path_bad_expr', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[19], 0, GrammarGenerator._alt_conds[0]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[16], 0, GrammarGenerator._alt_conds[6]) as alt0:
                 current = rule.current
-                [self.T__243, self.T__244, self.T__245, self.T__246, self.T__247, self.T__248, self.T__249, self.T__250, self.T__191][alt0()](parent=current)
+                [self.T__258, self.T__259, self.T__260, self.T__261, self.T__262, self.T__263, self.T__183][alt0()](parent=current)
             current = rule.current
         return current
 
     def deque_bad_expr(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'deque_bad_expr', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[20], 0, GrammarGenerator._alt_conds[8]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[19], 0, GrammarGenerator._alt_conds[9]) as alt0:
                 current = rule.current
-                [self.T__251, self.T__252, self.T__253, self.T__254, self.T__255, self.T__256, self.T__257, self.T__258, self.T__252, self.T__259, self.T__216, self.T__217][alt0()](parent=current)
+                [self.T__264, self.T__265, self.T__266, self.T__267, self.T__268, self.T__269, self.T__270, self.T__271, self.T__265, self.T__272, self.T__231, self.T__232][alt0()](parent=current)
             current = rule.current
         return current
 
     def mixed_bad_expr(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'mixed_bad_expr', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[21], 0, GrammarGenerator._alt_conds[9]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[20], 0, GrammarGenerator._alt_conds[10]) as alt0:
                 current = rule.current
-                [self.T__260, self.T__261, self.T__262, self.T__263, self.T__192, self.T__264, self.T__265, self.T__266, self.T__216, self.T__217, self.T__267][alt0()](parent=current)
+                [self.T__273, self.T__274, self.T__275, self.T__276, self.T__186, self.T__184, self.T__185, self.T__193, self.T__277, self.T__198, self.T__278, self.T__279, self.T__280, self.T__281, self.T__282, self.T__283, self.T__284, self.T__285, self.T__286, self.T__287, self.T__288, self.T__289, self.T__290, self.T__291, self.T__191, self.T__292, self.T__293, self.T__294, self.T__295, self.T__296, self.T__231, self.T__232, self.T__297][alt0()](parent=current)
             current = rule.current
         return current
 
     def num_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'num_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[19], 0, GrammarGenerator._alt_conds[0]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[21], 0, GrammarGenerator._alt_conds[11]) as alt0:
                 current = rule.current
-                [self.T__268, self.T__269, self.T__270, self.T__271, self.T__272, self.T__273, self.T__274, self.T__275, self.T__276][alt0()](parent=current)
+                [self.T__298, self.T__299, self.T__300, self.T__301, self.T__302, self.T__303, self.T__304, self.T__305, self.T__306, self.T__307, self.T__308, self.T__309, self.T__310, self.T__311, self.T__312, self.T__313, self.T__314, self.T__315, self.T__316][alt0()](parent=current)
             current = rule.current
         return current
 
     def pos_num_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'pos_num_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[16], 0, GrammarGenerator._alt_conds[6]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[22], 0, GrammarGenerator._alt_conds[12]) as alt0:
                 current = rule.current
-                [self.T__270, self.T__271, self.T__272, self.T__273, self.T__274, self.T__275, self.T__276][alt0()](parent=current)
+                [self.T__304, self.T__305, self.T__306, self.T__307, self.T__308, self.T__309, self.T__310, self.T__311, self.T__312, self.T__313, self.T__314, self.T__315, self.T__316][alt0()](parent=current)
             current = rule.current
         return current
 
     def bool_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'bool_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[22], 0, GrammarGenerator._alt_conds[2]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[23], 0, GrammarGenerator._alt_conds[2]) as alt0:
                 current = rule.current
-                [self.T__277, self.T__278][alt0()](parent=current)
+                [self.T__317, self.T__318][alt0()](parent=current)
             current = rule.current
         return current
 
     def str_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'str_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[23], 0, GrammarGenerator._alt_conds[1]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[16], 0, GrammarGenerator._alt_conds[6]) as alt0:
                 current = rule.current
-                [self.T__279, self.T__280, self.T__281, self.T__282, self.T__283][alt0()](parent=current)
+                [self.T__319, self.T__320, self.T__321, self.T__322, self.T__323, self.T__324, self.T__325][alt0()](parent=current)
             current = rule.current
         return current
 
     def bytes_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'bytes_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[24], 0, GrammarGenerator._alt_conds[10]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[24], 0, GrammarGenerator._alt_conds[1]) as alt0:
                 current = rule.current
-                [self.T__284, self.T__285, self.T__286, self.T__287][alt0()](parent=current)
+                [self.T__326, self.T__327, self.T__328, self.T__329, self.T__330][alt0()](parent=current)
             current = rule.current
         return current
 
     def digit_text_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'digit_text_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[24], 0, GrammarGenerator._alt_conds[10]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[17], 0, GrammarGenerator._alt_conds[7]) as alt0:
                 current = rule.current
-                [self.T__288, self.T__289, self.T__290, self.T__291][alt0()](parent=current)
+                [self.T__331, self.T__332, self.T__333, self.T__334, self.T__335, self.T__336][alt0()](parent=current)
             current = rule.current
         return current
 
     def bad_text_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'bad_text_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[25], 0, GrammarGenerator._alt_conds[11]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[25], 0, GrammarGenerator._alt_conds[13]) as alt0:
                 current = rule.current
-                [self.T__292, self.T__293, self.T__294][alt0()](parent=current)
+                [self.T__337, self.T__338, self.T__339, self.T__340][alt0()](parent=current)
             current = rule.current
         return current
 
     def hex_text_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'hex_text_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[22], 0, GrammarGenerator._alt_conds[2]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[26], 0, GrammarGenerator._alt_conds[14]) as alt0:
                 current = rule.current
-                [self.T__295, self.T__296][alt0()](parent=current)
+                [self.T__341, self.T__342, self.T__343][alt0()](parent=current)
             current = rule.current
         return current
 
     def key_lit(self, parent: ParentRule | None = None) -> Rule:
         with UnparserRuleContext(self, 'key_lit', parent) as rule:
             current = rule.current
-            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[24], 0, GrammarGenerator._alt_conds[10]) as alt0:
+            with AlternationContext(rule, 0, GrammarGenerator._alt_sizes[24], 0, GrammarGenerator._alt_conds[1]) as alt0:
                 current = rule.current
-                [self.T__297, self.T__292, self.T__298, self.T__299][alt0()](parent=current)
+                [self.T__344, self.T__337, self.T__345, self.T__346, self.T__347][alt0()](parent=current)
             current = rule.current
         return current
 
@@ -1883,1573 +1854,1861 @@ class GrammarGenerator(Generator):
     def T__38(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__38', parent, True) as rule:
             current = rule.current
-            current.src += 'import re'
+            current.src += 'from pathlib import Path'
         return current
 
     def T__39(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__39', parent, True) as rule:
             current = rule.current
-            current.src += 'text = \"ab12cd34\"'
+            current.src += 'p = Path(\"alpha/beta.txt\")'
         return current
 
     def T__40(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__40', parent, True) as rule:
             current = rule.current
-            current.src += 'parts = re.split(r\"\\d+\", text)'
+            current.src += 'child = p.with_suffix(\".log\")'
         return current
 
     def T__41(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__41', parent, True) as rule:
             current = rule.current
-            current.src += 'found = re.findall(r\"[a-z]+\", text)'
+            current.src += 'parts = list(p.parts)'
         return current
 
     def T__42(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__42', parent, True) as rule:
             current = rule.current
-            current.src += 'found_count = len(found)'
+            current.src += 'path_text = str(child)'
         return current
 
     def T__43(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__43', parent, True) as rule:
             current = rule.current
-            current.src += 'import json'
+            current.src += 'from collections import deque'
         return current
 
     def T__44(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__44', parent, True) as rule:
             current = rule.current
-            current.src += 'payload = \"{\\\"a\\\": 1, \\\"b\\\": 2}\"'
+            current.src += 'dq = deque(['
         return current
 
     def T__45(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__45', parent, True) as rule:
             current = rule.current
-            current.src += 'obj = json.loads(payload)'
+            current.src += '])'
         return current
 
     def T__46(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__46', parent, True) as rule:
             current = rule.current
-            current.src += 'keys = list(obj)'
+            current.src += 'copied = deque(dq)'
         return current
 
     def T__47(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__47', parent, True) as rule:
             current = rule.current
-            current.src += 'key_count = len(keys)'
+            current.src += 'front = dq[0]'
         return current
 
     def T__48(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__48', parent, True) as rule:
             current = rule.current
-            current.src += 'from pathlib import Path'
+            current.src += 'length = len(dq)'
         return current
 
     def T__49(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__49', parent, True) as rule:
             current = rule.current
-            current.src += 'p = Path(\"alpha/beta.txt\")'
+            current.src += '    pass'
         return current
 
     def T__50(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__50', parent, True) as rule:
             current = rule.current
-            current.src += 'child = p.with_suffix(\".log\")'
+            current.src += 'box = Box()'
         return current
 
     def T__51(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__51', parent, True) as rule:
             current = rule.current
-            current.src += 'parts = list(p.parts)'
+            current.src += 'def build(seq):'
         return current
 
     def T__52(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__52', parent, True) as rule:
             current = rule.current
-            current.src += 'path_text = str(child)'
+            current.src += '    return list(seq)'
         return current
 
     def T__53(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__53', parent, True) as rule:
             current = rule.current
-            current.src += 'from collections import deque'
+            current.src += 'built = build(nums)'
         return current
 
     def T__54(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__54', parent, True) as rule:
             current = rule.current
-            current.src += 'dq = deque(['
+            current.src += 'from_map = list(mapping.values())'
         return current
 
     def T__55(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__55', parent, True) as rule:
             current = rule.current
-            current.src += '])'
+            current.src += 'total = sum(nums)'
         return current
 
     def T__56(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__56', parent, True) as rule:
             current = rule.current
-            current.src += 'copied = deque(dq)'
+            current.src += 'total = 0'
         return current
 
     def T__57(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__57', parent, True) as rule:
             current = rule.current
-            current.src += 'front = dq[0]'
+            current.src += 'for x in nums:'
         return current
 
     def T__58(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__58', parent, True) as rule:
             current = rule.current
-            current.src += 'length = len(dq)'
+            current.src += '    total = total + x'
         return current
 
     def T__59(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__59', parent, True) as rule:
             current = rule.current
-            current.src += '    pass'
+            current.src += 'bigger = max(nums)'
         return current
 
     def T__60(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__60', parent, True) as rule:
             current = rule.current
-            current.src += 'box = Box()'
+            current.src += 'nonneg = bigger >= 0'
         return current
 
     def T__61(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__61', parent, True) as rule:
             current = rule.current
-            current.src += 'def build(seq):'
+            current.src += 'if value < other:'
         return current
 
     def T__62(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__62', parent, True) as rule:
             current = rule.current
-            current.src += '    return list(seq)'
+            current.src += '    chosen = value'
         return current
 
     def T__63(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__63', parent, True) as rule:
             current = rule.current
-            current.src += 'built = build(nums)'
+            current.src += 'else:'
         return current
 
     def T__64(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__64', parent, True) as rule:
             current = rule.current
-            current.src += 'from_map = list(mapping.values())'
+            current.src += '    chosen = other'
         return current
 
     def T__65(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__65', parent, True) as rule:
             current = rule.current
-            current.src += 'total = 0'
+            current.src += 'tail = nums[1:]'
         return current
 
     def T__66(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__66', parent, True) as rule:
             current = rule.current
-            current.src += 'for x in nums:'
+            current.src += 'tail_count = len(tail)'
         return current
 
     def T__67(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__67', parent, True) as rule:
             current = rule.current
-            current.src += '    total = total + x'
+            current.src += 'square_map = {x: x * x for x in nums}'
         return current
 
     def T__68(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__68', parent, True) as rule:
             current = rule.current
-            current.src += 'bigger = max(nums)'
+            current.src += 'square_count = len(square_map)'
         return current
 
     def T__69(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__69', parent, True) as rule:
             current = rule.current
-            current.src += 'nonneg = bigger >= 0'
+            current.src += 'joined = text + upper'
         return current
 
     def T__70(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__70', parent, True) as rule:
             current = rule.current
-            current.src += 'if value < other:'
+            current.src += 'joined_count = len(joined)'
         return current
 
     def T__71(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__71', parent, True) as rule:
             current = rule.current
-            current.src += '    chosen = value'
+            current.src += 'if text:'
         return current
 
     def T__72(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__72', parent, True) as rule:
             current = rule.current
-            current.src += 'else:'
+            current.src += '    first = text[0]'
         return current
 
     def T__73(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__73', parent, True) as rule:
             current = rule.current
-            current.src += '    chosen = other'
+            current.src += '    first = \"\"'
         return current
 
     def T__74(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__74', parent, True) as rule:
             current = rule.current
-            current.src += 'tail = nums[1:]'
+            current.src += 'rev = text[::-1]'
         return current
 
     def T__75(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__75', parent, True) as rule:
             current = rule.current
-            current.src += 'tail_count = len(tail)'
+            current.src += 'rev_count = len(rev)'
         return current
 
     def T__76(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__76', parent, True) as rule:
             current = rule.current
-            current.src += 'square_map = {x: x * x for x in nums}'
+            current.src += 'sizes = [len(p) for p in parts]'
         return current
 
     def T__77(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__77', parent, True) as rule:
             current = rule.current
-            current.src += 'square_count = len(square_map)'
+            current.src += 'size_count = len(sizes)'
         return current
 
     def T__78(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__78', parent, True) as rule:
             current = rule.current
-            current.src += 'joined = text + upper'
+            current.src += 'mapping = {c: ord(c) for c in text}'
         return current
 
     def T__79(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__79', parent, True) as rule:
             current = rule.current
-            current.src += 'joined_count = len(joined)'
+            current.src += 'mapping_count = len(mapping)'
         return current
 
     def T__80(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__80', parent, True) as rule:
             current = rule.current
-            current.src += 'if text:'
+            current.src += 'head = copy[0]'
         return current
 
     def T__81(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__81', parent, True) as rule:
             current = rule.current
-            current.src += '    first = text[0]'
+            current.src += 'same_head = head == nums[0]'
         return current
 
     def T__82(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__82', parent, True) as rule:
             current = rule.current
-            current.src += '    first = \"\"'
+            current.src += 'keys = list(mapping)'
         return current
 
     def T__83(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__83', parent, True) as rule:
             current = rule.current
-            current.src += 'rev = text[::-1]'
+            current.src += 'key_size = len(keys)'
         return current
 
     def T__84(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__84', parent, True) as rule:
             current = rule.current
-            current.src += 'rev_count = len(rev)'
+            current.src += 'if nums:'
         return current
 
     def T__85(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__85', parent, True) as rule:
             current = rule.current
-            current.src += 'sizes = [len(p) for p in parts]'
+            current.src += '    small = min(nums)'
         return current
 
     def T__86(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__86', parent, True) as rule:
             current = rule.current
-            current.src += 'size_count = len(sizes)'
+            current.src += '    small = 0'
         return current
 
     def T__87(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__87', parent, True) as rule:
             current = rule.current
-            current.src += 'mapping = {c: ord(c) for c in text}'
+            current.src += 'pairs = [(k, mapping[k]) for k in mapping]'
         return current
 
     def T__88(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__88', parent, True) as rule:
             current = rule.current
-            current.src += 'mapping_count = len(mapping)'
+            current.src += 'pair_size = len(pairs)'
         return current
 
     def T__89(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__89', parent, True) as rule:
             current = rule.current
-            current.src += 'head = copy[0]'
+            current.src += 'triple = pair + (value,)'
         return current
 
     def T__90(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__90', parent, True) as rule:
             current = rule.current
-            current.src += 'same_head = head == nums[0]'
+            current.src += 'triple_size = len(triple)'
         return current
 
     def T__91(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__91', parent, True) as rule:
             current = rule.current
-            current.src += 'keys = list(mapping)'
+            current.src += 'label = box.label()'
         return current
 
     def T__92(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__92', parent, True) as rule:
             current = rule.current
-            current.src += 'key_size = len(keys)'
+            current.src += 'label_size = len(label)'
         return current
 
     def T__93(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__93', parent, True) as rule:
             current = rule.current
-            current.src += 'if nums:'
+            current.src += 'box.extra = '
         return current
 
     def T__94(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__94', parent, True) as rule:
             current = rule.current
-            current.src += '    small = min(nums)'
+            current.src += 'mirror = box.extra'
         return current
 
     def T__95(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__95', parent, True) as rule:
             current = rule.current
-            current.src += '    small = 0'
+            current.src += 'if hasattr(box, \"payload\"):'
         return current
 
     def T__96(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__96', parent, True) as rule:
             current = rule.current
-            current.src += 'pairs = [(k, mapping[k]) for k in mapping]'
+            current.src += '    current = box.payload'
         return current
 
     def T__97(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__97', parent, True) as rule:
             current = rule.current
-            current.src += 'pair_size = len(pairs)'
+            current.src += '    current = 0'
         return current
 
     def T__98(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__98', parent, True) as rule:
             current = rule.current
-            current.src += 'triple = pair + (value,)'
+            current.src += 'text = box.label()'
         return current
 
     def T__99(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__99', parent, True) as rule:
             current = rule.current
-            current.src += 'triple_size = len(triple)'
+            current.src += 'text_size = len(text)'
         return current
 
     def T__100(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__100', parent, True) as rule:
             current = rule.current
-            current.src += 'label = box.label()'
+            current.src += 'items = [box.payload, box.payload]'
         return current
 
     def T__101(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__101', parent, True) as rule:
             current = rule.current
-            current.src += 'label_size = len(label)'
+            current.src += 'item_size = len(items)'
         return current
 
     def T__102(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__102', parent, True) as rule:
             current = rule.current
-            current.src += 'box.extra = '
+            current.src += 'text2 = raw.decode(\"latin1\")'
         return current
 
     def T__103(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__103', parent, True) as rule:
             current = rule.current
-            current.src += 'mirror = box.extra'
+            current.src += 'text2_size = len(text2)'
         return current
 
     def T__104(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__104', parent, True) as rule:
             current = rule.current
-            current.src += 'if hasattr(box, \"payload\"):'
+            current.src += 'first = blob[0]'
         return current
 
     def T__105(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__105', parent, True) as rule:
             current = rule.current
-            current.src += '    current = box.payload'
+            current.src += 'first_copy = first'
         return current
 
     def T__106(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__106', parent, True) as rule:
             current = rule.current
-            current.src += '    current = 0'
+            current.src += 'joined = raw + raw'
         return current
 
     def T__107(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__107', parent, True) as rule:
             current = rule.current
-            current.src += 'text = box.label()'
+            current.src += 'joined_size = len(joined)'
         return current
 
     def T__108(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__108', parent, True) as rule:
             current = rule.current
-            current.src += 'text_size = len(text)'
+            current.src += 'if raw:'
         return current
 
     def T__109(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__109', parent, True) as rule:
             current = rule.current
-            current.src += 'items = [box.payload, box.payload]'
+            current.src += '    tail = raw[1:]'
         return current
 
     def T__110(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__110', parent, True) as rule:
             current = rule.current
-            current.src += 'item_size = len(items)'
+            current.src += '    tail = b\"\"'
         return current
 
     def T__111(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__111', parent, True) as rule:
             current = rule.current
-            current.src += 'text2 = raw.decode(\"latin1\")'
+            current.src += 'nums = [x for x in blob]'
         return current
 
     def T__112(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__112', parent, True) as rule:
             current = rule.current
-            current.src += 'text2_size = len(text2)'
+            current.src += 'nums_size = len(nums)'
         return current
 
     def T__113(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__113', parent, True) as rule:
             current = rule.current
-            current.src += 'first = blob[0]'
+            current.src += 'n = int(num_text)'
         return current
 
     def T__114(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__114', parent, True) as rule:
             current = rule.current
-            current.src += 'first_copy = first'
+            current.src += 'n2 = n + 1'
         return current
 
     def T__115(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__115', parent, True) as rule:
             current = rule.current
-            current.src += 'joined = raw + raw'
+            current.src += 'f = float(num_text)'
         return current
 
     def T__116(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__116', parent, True) as rule:
             current = rule.current
-            current.src += 'joined_size = len(joined)'
+            current.src += 'f2 = f + 1.0'
         return current
 
     def T__117(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__117', parent, True) as rule:
             current = rule.current
-            current.src += 'if raw:'
+            current.src += 'combo = \":\".join(items)'
         return current
 
     def T__118(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__118', parent, True) as rule:
             current = rule.current
-            current.src += '    tail = raw[1:]'
+            current.src += 'combo_size = len(combo)'
         return current
 
     def T__119(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__119', parent, True) as rule:
             current = rule.current
-            current.src += '    tail = b\"\"'
+            current.src += 'bits = list(hex_text)'
         return current
 
     def T__120(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__120', parent, True) as rule:
             current = rule.current
-            current.src += 'nums = [x for x in blob]'
+            current.src += 'bits_size = len(bits)'
         return current
 
     def T__121(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__121', parent, True) as rule:
             current = rule.current
-            current.src += 'nums_size = len(nums)'
+            current.src += 'if bad_text:'
         return current
 
     def T__122(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__122', parent, True) as rule:
             current = rule.current
-            current.src += 'n = int(num_text)'
+            current.src += '    probe = bad_text[0]'
         return current
 
     def T__123(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__123', parent, True) as rule:
             current = rule.current
-            current.src += 'n2 = n + 1'
+            current.src += '    probe = \"\"'
         return current
 
     def T__124(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__124', parent, True) as rule:
             current = rule.current
-            current.src += 'f = float(num_text)'
+            current.src += 'suffix = child.suffix'
         return current
 
     def T__125(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__125', parent, True) as rule:
             current = rule.current
-            current.src += 'f2 = f + 1.0'
+            current.src += 'suffix_size = len(suffix)'
         return current
 
     def T__126(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__126', parent, True) as rule:
             current = rule.current
-            current.src += 'combo = \":\".join(items)'
+            current.src += 'name = p.name'
         return current
 
     def T__127(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__127', parent, True) as rule:
             current = rule.current
-            current.src += 'combo_size = len(combo)'
+            current.src += 'name_size = len(name)'
         return current
 
     def T__128(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__128', parent, True) as rule:
             current = rule.current
-            current.src += 'bits = list(hex_text)'
+            current.src += 'parent = p.parent'
         return current
 
     def T__129(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__129', parent, True) as rule:
             current = rule.current
-            current.src += 'bits_size = len(bits)'
+            current.src += 'parent_text = str(parent)'
         return current
 
     def T__130(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__130', parent, True) as rule:
             current = rule.current
-            current.src += 'if bad_text:'
+            current.src += 'joined = p.joinpath(\"gamma\")'
         return current
 
     def T__131(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__131', parent, True) as rule:
             current = rule.current
-            current.src += '    probe = bad_text[0]'
+            current.src += 'joined_text = str(joined)'
         return current
 
     def T__132(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__132', parent, True) as rule:
             current = rule.current
-            current.src += '    probe = \"\"'
+            current.src += 'dq.append('
         return current
 
     def T__133(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__133', parent, True) as rule:
             current = rule.current
-            current.src += 'suffix = child.suffix'
+            current.src += 'after = len(dq)'
         return current
 
     def T__134(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__134', parent, True) as rule:
             current = rule.current
-            current.src += 'suffix_size = len(suffix)'
+            current.src += 'rot = deque(dq)'
         return current
 
     def T__135(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__135', parent, True) as rule:
             current = rule.current
-            current.src += 'name = p.name'
+            current.src += 'rot.rotate(1)'
         return current
 
     def T__136(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__136', parent, True) as rule:
             current = rule.current
-            current.src += 'name_size = len(name)'
+            current.src += 'items = list(dq)'
         return current
 
     def T__137(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__137', parent, True) as rule:
             current = rule.current
-            current.src += 'parent = p.parent'
+            current.src += 'item_count = len(items)'
         return current
 
     def T__138(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__138', parent, True) as rule:
             current = rule.current
-            current.src += 'parent_text = str(parent)'
+            current.src += 'if dq:'
         return current
 
     def T__139(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__139', parent, True) as rule:
             current = rule.current
-            current.src += 'joined = p.joinpath(\"gamma\")'
+            current.src += '    head = dq[0]'
         return current
 
     def T__140(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__140', parent, True) as rule:
             current = rule.current
-            current.src += 'joined_text = str(joined)'
+            current.src += '    head = 0'
         return current
 
     def T__141(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__141', parent, True) as rule:
             current = rule.current
-            current.src += 'dq.append('
+            current.src += 'pair = tuple(dq)'
         return current
 
     def T__142(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__142', parent, True) as rule:
             current = rule.current
-            current.src += 'after = len(dq)'
+            current.src += 'pair_size = len(pair)'
         return current
 
     def T__143(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__143', parent, True) as rule:
             current = rule.current
-            current.src += 'rot = deque(dq)'
+            current.src += 'merged = text + str(value)'
         return current
 
     def T__144(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__144', parent, True) as rule:
             current = rule.current
-            current.src += 'rot.rotate(1)'
+            current.src += 'merged_size = len(merged)'
         return current
 
     def T__145(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__145', parent, True) as rule:
             current = rule.current
-            current.src += 'items = list(dq)'
+            current.src += 'again = build(parts)'
         return current
 
     def T__146(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__146', parent, True) as rule:
             current = rule.current
-            current.src += 'item_count = len(items)'
+            current.src += 'again_size = len(again)'
         return current
 
     def T__147(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__147', parent, True) as rule:
             current = rule.current
-            current.src += 'if dq:'
+            current.src += 'if flag:'
         return current
 
     def T__148(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__148', parent, True) as rule:
             current = rule.current
-            current.src += '    head = dq[0]'
+            current.src += '    probe = built[0]'
         return current
 
     def T__149(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__149', parent, True) as rule:
             current = rule.current
-            current.src += '    head = 0'
+            current.src += '    probe = value'
         return current
 
     def T__150(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__150', parent, True) as rule:
             current = rule.current
-            current.src += 'pair = tuple(dq)'
+            current.src += 'for x in 1:'
         return current
 
     def T__151(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__151', parent, True) as rule:
             current = rule.current
-            current.src += 'pair_size = len(pair)'
+            current.src += 'with box as ctx:'
         return current
 
     def T__152(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__152', parent, True) as rule:
             current = rule.current
-            current.src += 'merged = text + str(value)'
+            current.src += 'def boom():'
         return current
 
     def T__153(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__153', parent, True) as rule:
             current = rule.current
-            current.src += 'merged_size = len(merged)'
+            current.src += '    x = x + 1'
         return current
 
     def T__154(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__154', parent, True) as rule:
             current = rule.current
-            current.src += 'again = build(parts)'
+            current.src += 'boom()'
         return current
 
     def T__155(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__155', parent, True) as rule:
             current = rule.current
-            current.src += 'again_size = len(again)'
+            current.src += 'tmp = '
         return current
 
     def T__156(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__156', parent, True) as rule:
             current = rule.current
-            current.src += 'if flag:'
+            current.src += 'if True:'
         return current
 
     def T__157(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__157', parent, True) as rule:
             current = rule.current
-            current.src += '    probe = built[0]'
+            current.src += '    '
         return current
 
     def T__158(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__158', parent, True) as rule:
             current = rule.current
-            current.src += '    probe = value'
+            current.src += 'thunk = lambda: '
         return current
 
     def T__159(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__159', parent, True) as rule:
             current = rule.current
-            current.src += 'for x in 1:'
+            current.src += 'thunk()'
         return current
 
     def T__160(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__160', parent, True) as rule:
             current = rule.current
-            current.src += 'with box as ctx:'
+            current.src += 'def explode():'
         return current
 
     def T__161(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__161', parent, True) as rule:
             current = rule.current
-            current.src += 'raise NotImplementedError(\"todo\")'
+            current.src += '    return '
         return current
 
     def T__162(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__162', parent, True) as rule:
             current = rule.current
-            current.src += 'def boom():'
+            current.src += 'explode()'
         return current
 
     def T__163(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__163', parent, True) as rule:
             current = rule.current
-            current.src += '    x = x + 1'
+            current.src += 'def inner():'
         return current
 
     def T__164(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__164', parent, True) as rule:
             current = rule.current
-            current.src += 'boom()'
+            current.src += 'def outer():'
         return current
 
     def T__165(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__165', parent, True) as rule:
             current = rule.current
-            current.src += 'tmp = '
+            current.src += '    return inner()'
         return current
 
     def T__166(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__166', parent, True) as rule:
             current = rule.current
-            current.src += 'if True:'
+            current.src += 'outer()'
         return current
 
     def T__167(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__167', parent, True) as rule:
             current = rule.current
-            current.src += '    '
+            current.src += 'class Runner:'
         return current
 
     def T__168(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__168', parent, True) as rule:
             current = rule.current
-            current.src += 'thunk = lambda: '
+            current.src += '    def go(self):'
         return current
 
     def T__169(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__169', parent, True) as rule:
             current = rule.current
-            current.src += 'thunk()'
+            current.src += '        return '
         return current
 
     def T__170(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__170', parent, True) as rule:
             current = rule.current
-            current.src += 'def explode():'
+            current.src += 'Runner().go()'
         return current
 
     def T__171(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__171', parent, True) as rule:
             current = rule.current
-            current.src += '    return '
+            current.src += 'try:'
         return current
 
     def T__172(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__172', parent, True) as rule:
             current = rule.current
-            current.src += 'explode()'
+            current.src += 'finally:'
         return current
 
     def T__173(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__173', parent, True) as rule:
             current = rule.current
-            current.src += 'def inner():'
+            current.src += '    marker = 1'
         return current
 
     def T__174(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__174', parent, True) as rule:
             current = rule.current
-            current.src += 'def outer():'
+            current.src += 'nums + {}'
         return current
 
     def T__175(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__175', parent, True) as rule:
             current = rule.current
-            current.src += '    return inner()'
+            current.src += 'roots[None]'
         return current
 
     def T__176(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__176', parent, True) as rule:
             current = rule.current
-            current.src += 'outer()'
+            current.src += 'math.sqrt(\"x\")'
         return current
 
     def T__177(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__177', parent, True) as rule:
             current = rule.current
-            current.src += 'class Runner:'
+            current.src += 'math.log(-1.0)'
         return current
 
     def T__178(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__178', parent, True) as rule:
             current = rule.current
-            current.src += '    def go(self):'
+            current.src += 'math.factorial(-1)'
         return current
 
     def T__179(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__179', parent, True) as rule:
             current = rule.current
-            current.src += '        return '
+            current.src += 'math.isqrt(-1)'
         return current
 
     def T__180(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__180', parent, True) as rule:
             current = rule.current
-            current.src += 'Runner().go()'
+            current.src += 'value < 1j'
         return current
 
     def T__181(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__181', parent, True) as rule:
             current = rule.current
-            current.src += 'try:'
+            current.src += 'range(\"x\")'
         return current
 
     def T__182(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__182', parent, True) as rule:
             current = rule.current
-            current.src += 'finally:'
+            current.src += 'pow(1, 1, 0)'
         return current
 
     def T__183(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__183', parent, True) as rule:
             current = rule.current
-            current.src += '    marker = 1'
+            current.src += '1 / 0'
         return current
 
     def T__184(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__184', parent, True) as rule:
             current = rule.current
-            current.src += 'nums + {}'
+            current.src += '1 // 0'
         return current
 
     def T__185(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__185', parent, True) as rule:
             current = rule.current
-            current.src += 'roots[None]'
+            current.src += '1 % 0'
         return current
 
     def T__186(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__186', parent, True) as rule:
             current = rule.current
-            current.src += 'math.sqrt(\"x\")'
+            current.src += 'divmod(1, 0)'
         return current
 
     def T__187(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__187', parent, True) as rule:
             current = rule.current
-            current.src += 'math.log(-1.0)'
+            current.src += 'math.exp(1000)'
         return current
 
     def T__188(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__188', parent, True) as rule:
             current = rule.current
-            current.src += 'value < 1j'
+            current.src += 'math.cosh(1000)'
         return current
 
     def T__189(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__189', parent, True) as rule:
             current = rule.current
-            current.src += 'range(\"x\")'
+            current.src += 'math.ldexp(1.0, 100000)'
         return current
 
     def T__190(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__190', parent, True) as rule:
             current = rule.current
-            current.src += 'pow(1, 1, 0)'
+            current.src += 'float(10 ** 1000)'
         return current
 
     def T__191(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__191', parent, True) as rule:
             current = rule.current
-            current.src += '1 / 0'
+            current.src += '1 << -1'
         return current
 
     def T__192(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__192', parent, True) as rule:
             current = rule.current
-            current.src += 'divmod(1, 0)'
+            current.src += '1 >> -1'
         return current
 
     def T__193(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__193', parent, True) as rule:
             current = rule.current
-            current.src += 'math.exp(1000)'
+            current.src += 'value << \"x\"'
         return current
 
     def T__194(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__194', parent, True) as rule:
             current = rule.current
-            current.src += 'text + 1'
+            current.src += 'value >> {}'
         return current
 
     def T__195(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__195', parent, True) as rule:
             current = rule.current
-            current.src += 'upper - {}'
+            current.src += 'value // \"x\"'
         return current
 
     def T__196(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__196', parent, True) as rule:
             current = rule.current
-            current.src += 'text[None]'
+            current.src += 'value // []'
         return current
 
     def T__197(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__197', parent, True) as rule:
             current = rule.current
-            current.src += 'parts + {}'
+            current.src += 'value % ()'
         return current
 
     def T__198(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__198', parent, True) as rule:
             current = rule.current
-            current.src += 'ord(1)'
+            current.src += 'value % {}'
         return current
 
     def T__199(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__199', parent, True) as rule:
             current = rule.current
-            current.src += 'chr(text)'
+            current.src += 'value * {}'
         return current
 
     def T__200(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__200', parent, True) as rule:
             current = rule.current
-            current.src += 'text.index(\"zzz\")'
+            current.src += 'value - []'
         return current
 
     def T__201(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__201', parent, True) as rule:
             current = rule.current
-            current.src += 'text.encode(1)'
+            current.src += 'value - ()'
         return current
 
     def T__202(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__202', parent, True) as rule:
             current = rule.current
-            current.src += 'text.encode(\"nope\")'
+            current.src += 'nums[0] + {}'
         return current
 
     def T__203(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__203', parent, True) as rule:
             current = rule.current
-            current.src += '\"\u20ac\".encode(\"ascii\")'
+            current.src += 'text + 1'
         return current
 
     def T__204(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__204', parent, True) as rule:
             current = rule.current
-            current.src += 'copy + {}'
+            current.src += 'upper - {}'
         return current
 
     def T__205(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__205', parent, True) as rule:
             current = rule.current
-            current.src += 'mapping[0.5]'
+            current.src += 'text[None]'
         return current
 
     def T__206(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__206', parent, True) as rule:
             current = rule.current
-            current.src += 'mapping[\"missing\"]'
+            current.src += 'parts + {}'
         return current
 
     def T__207(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__207', parent, True) as rule:
             current = rule.current
-            current.src += 'mapping.pop(\"missing\")'
+            current.src += 'ord(1)'
         return current
 
     def T__208(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__208', parent, True) as rule:
             current = rule.current
-            current.src += 'copy[99]'
+            current.src += 'chr(text)'
         return current
 
     def T__209(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__209', parent, True) as rule:
             current = rule.current
-            current.src += 'copy[None]'
+            current.src += 'text.index(\"zzz\")'
         return current
 
     def T__210(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__210', parent, True) as rule:
             current = rule.current
-            current.src += 'seen[0]'
+            current.src += 'text.encode(1)'
         return current
 
     def T__211(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__211', parent, True) as rule:
             current = rule.current
-            current.src += 'seen.remove(99)'
+            current.src += 'copy + {}'
         return current
 
     def T__212(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__212', parent, True) as rule:
             current = rule.current
-            current.src += 'copy.remove(99)'
+            current.src += 'mapping[0.5]'
         return current
 
     def T__213(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__213', parent, True) as rule:
             current = rule.current
-            current.src += 'pair + {}'
+            current.src += 'mapping[\"missing\"]'
         return current
 
     def T__214(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__214', parent, True) as rule:
             current = rule.current
-            current.src += 'nums - {}'
+            current.src += 'mapping.pop(\"missing\")'
         return current
 
     def T__215(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__215', parent, True) as rule:
             current = rule.current
-            current.src += 'sum(1)'
+            current.src += 'copy[99]'
         return current
 
     def T__216(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__216', parent, True) as rule:
             current = rule.current
-            current.src += 'next(iter([]))'
+            current.src += 'copy[None]'
         return current
 
     def T__217(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__217', parent, True) as rule:
             current = rule.current
-            current.src += 'next(iter(()))'
+            current.src += 'seen[0]'
         return current
 
     def T__218(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__218', parent, True) as rule:
             current = rule.current
-            current.src += 'box + []'
+            current.src += 'seen.remove(99)'
         return current
 
     def T__219(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__219', parent, True) as rule:
             current = rule.current
-            current.src += 'box.missing'
+            current.src += 'copy.remove(99)'
         return current
 
     def T__220(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__220', parent, True) as rule:
             current = rule.current
-            current.src += 'next(box)'
+            current.src += 'pair + {}'
         return current
 
     def T__221(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__221', parent, True) as rule:
             current = rule.current
-            current.src += 'len(box)'
+            current.src += 'nums - {}'
         return current
 
     def T__222(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__222', parent, True) as rule:
             current = rule.current
-            current.src += 'box[0]'
+            current.src += 'nums[1] // 0'
         return current
 
     def T__223(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__223', parent, True) as rule:
             current = rule.current
-            current.src += 'box < 1j'
+            current.src += 'nums[1] % 0'
         return current
 
     def T__224(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__224', parent, True) as rule:
             current = rule.current
-            current.src += 'box.payload[0]'
+            current.src += 'nums[0] << \"x\"'
         return current
 
     def T__225(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__225', parent, True) as rule:
             current = rule.current
-            current.src += 'raw + text'
+            current.src += 'nums[0] >> ()'
         return current
 
     def T__226(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__226', parent, True) as rule:
             current = rule.current
-            current.src += 'raw[None]'
+            current.src += 'nums[2] / []'
         return current
 
     def T__227(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__227', parent, True) as rule:
             current = rule.current
-            current.src += 'raw.decode(1)'
+            current.src += 'nums[0] / 0'
         return current
 
     def T__228(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__228', parent, True) as rule:
             current = rule.current
-            current.src += 'blob + {}'
+            current.src += 'nums[2] ** {}'
         return current
 
     def T__229(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__229', parent, True) as rule:
             current = rule.current
-            current.src += 'memoryview(1)'
+            current.src += 'pair * {}'
         return current
 
     def T__230(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__230', parent, True) as rule:
             current = rule.current
-            current.src += 'int(bad_text)'
+            current.src += 'sum(1)'
         return current
 
     def T__231(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__231', parent, True) as rule:
             current = rule.current
-            current.src += 'float(bad_text)'
+            current.src += 'next(iter([]))'
         return current
 
     def T__232(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__232', parent, True) as rule:
             current = rule.current
-            current.src += 'complex(bad_text)'
+            current.src += 'next(iter(()))'
         return current
 
     def T__233(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__233', parent, True) as rule:
             current = rule.current
-            current.src += 'int(num_text, 1)'
+            current.src += 'box + []'
         return current
 
     def T__234(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__234', parent, True) as rule:
             current = rule.current
-            current.src += 'int(hex_text, 10)'
+            current.src += 'box.missing'
         return current
 
     def T__235(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__235', parent, True) as rule:
             current = rule.current
-            current.src += 'bytes([999])'
+            current.src += 'next(box)'
         return current
 
     def T__236(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__236', parent, True) as rule:
             current = rule.current
-            current.src += 'bytearray(\"x\")'
+            current.src += 'len(box)'
         return current
 
     def T__237(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__237', parent, True) as rule:
             current = rule.current
-            current.src += 'chr(-1)'
+            current.src += 'box[0]'
         return current
 
     def T__238(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__238', parent, True) as rule:
             current = rule.current
-            current.src += 'float(10 ** 1000)'
+            current.src += 'box < 1j'
         return current
 
     def T__239(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__239', parent, True) as rule:
             current = rule.current
-            current.src += 'bytes.fromhex(\"zz\")'
+            current.src += 'box.payload[0]'
         return current
 
     def T__240(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__240', parent, True) as rule:
             current = rule.current
-            current.src += 'int(\"xyz\")'
+            current.src += 'raw + text'
         return current
 
     def T__241(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__241', parent, True) as rule:
             current = rule.current
-            current.src += 'float(\"-\")'
+            current.src += 'raw[None]'
         return current
 
     def T__242(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__242', parent, True) as rule:
             current = rule.current
-            current.src += 'complex(\"xyz\")'
+            current.src += 'raw.decode(1)'
         return current
 
     def T__243(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__243', parent, True) as rule:
             current = rule.current
-            current.src += 'parts[None]'
+            current.src += 'blob + {}'
         return current
 
     def T__244(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__244', parent, True) as rule:
             current = rule.current
-            current.src += 'parts[99]'
+            current.src += 'memoryview(1)'
         return current
 
     def T__245(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__245', parent, True) as rule:
             current = rule.current
-            current.src += 'p.relative_to(\"zzz\")'
+            current.src += 'int(bad_text)'
         return current
 
     def T__246(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__246', parent, True) as rule:
             current = rule.current
-            current.src += 'p.with_name(\"\")'
+            current.src += 'float(bad_text)'
         return current
 
     def T__247(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__247', parent, True) as rule:
             current = rule.current
-            current.src += 'child / 1'
+            current.src += 'complex(bad_text)'
         return current
 
     def T__248(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__248', parent, True) as rule:
             current = rule.current
-            current.src += 'p.read_text(encoding=1)'
+            current.src += 'int(num_text, 1)'
         return current
 
     def T__249(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__249', parent, True) as rule:
             current = rule.current
-            current.src += 'Path(\".\").read_text()'
+            current.src += 'int(hex_text, 10)'
         return current
 
     def T__250(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__250', parent, True) as rule:
             current = rule.current
-            current.src += 'Path(\".\").mkdir()'
+            current.src += 'bytes([999])'
         return current
 
     def T__251(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__251', parent, True) as rule:
             current = rule.current
-            current.src += 'dq[None]'
+            current.src += 'bytearray(\"x\")'
         return current
 
     def T__252(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__252', parent, True) as rule:
             current = rule.current
-            current.src += 'dq[99]'
+            current.src += 'chr(-1)'
         return current
 
     def T__253(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__253', parent, True) as rule:
             current = rule.current
-            current.src += 'dq.remove(99)'
+            current.src += 'pow(10, 1000, 0)'
         return current
 
     def T__254(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__254', parent, True) as rule:
             current = rule.current
-            current.src += 'dq.rotate(\"x\")'
+            current.src += 'bytes.fromhex(\"zz\")'
         return current
 
     def T__255(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__255', parent, True) as rule:
             current = rule.current
-            current.src += 'dq + []'
+            current.src += 'int(\"xyz\")'
         return current
 
     def T__256(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__256', parent, True) as rule:
             current = rule.current
-            current.src += 'next(dq)'
+            current.src += 'float(\"-\")'
         return current
 
     def T__257(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__257', parent, True) as rule:
             current = rule.current
-            current.src += 'deque().popleft()'
+            current.src += 'complex(\"xyz\")'
         return current
 
     def T__258(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__258', parent, True) as rule:
             current = rule.current
-            current.src += 'dq.remove(\"missing\")'
+            current.src += 'parts[None]'
         return current
 
     def T__259(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__259', parent, True) as rule:
             current = rule.current
-            current.src += 'deque().pop()'
+            current.src += 'parts[99]'
         return current
 
     def T__260(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__260', parent, True) as rule:
             current = rule.current
-            current.src += 'built[None]'
+            current.src += 'p.relative_to(\"zzz\")'
         return current
 
     def T__261(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__261', parent, True) as rule:
             current = rule.current
-            current.src += 'mapping + text'
+            current.src += 'p.with_name(\"\")'
         return current
 
     def T__262(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__262', parent, True) as rule:
             current = rule.current
-            current.src += 'box + mapping'
+            current.src += 'child / 1'
         return current
 
     def T__263(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__263', parent, True) as rule:
             current = rule.current
-            current.src += 'iter(1)'
+            current.src += 'p.read_text(encoding=1)'
         return current
 
     def T__264(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__264', parent, True) as rule:
             current = rule.current
-            current.src += 'complex(mapping)'
+            current.src += 'dq[None]'
         return current
 
     def T__265(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__265', parent, True) as rule:
             current = rule.current
-            current.src += 'roots + text'
+            current.src += 'dq[99]'
         return current
 
     def T__266(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__266', parent, True) as rule:
             current = rule.current
-            current.src += 'from_map[None]'
+            current.src += 'dq.remove(99)'
         return current
 
     def T__267(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__267', parent, True) as rule:
             current = rule.current
-            current.src += 'next(x for x in [])'
+            current.src += 'dq.rotate(\"x\")'
         return current
 
     def T__268(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__268', parent, True) as rule:
             current = rule.current
-            current.src += '-3'
+            current.src += 'dq + []'
         return current
 
     def T__269(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__269', parent, True) as rule:
             current = rule.current
-            current.src += '-1'
+            current.src += 'next(dq)'
         return current
 
     def T__270(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__270', parent, True) as rule:
             current = rule.current
-            current.src += '0'
+            current.src += 'deque().popleft()'
         return current
 
     def T__271(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__271', parent, True) as rule:
             current = rule.current
-            current.src += '1'
+            current.src += 'dq.remove(\"missing\")'
         return current
 
     def T__272(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__272', parent, True) as rule:
             current = rule.current
-            current.src += '2'
+            current.src += 'deque().pop()'
         return current
 
     def T__273(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__273', parent, True) as rule:
             current = rule.current
-            current.src += '3'
+            current.src += 'built[None]'
         return current
 
     def T__274(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__274', parent, True) as rule:
             current = rule.current
-            current.src += '4'
+            current.src += 'mapping + text'
         return current
 
     def T__275(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__275', parent, True) as rule:
             current = rule.current
-            current.src += '7'
+            current.src += 'box + mapping'
         return current
 
     def T__276(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__276', parent, True) as rule:
             current = rule.current
-            current.src += '10'
+            current.src += 'iter(1)'
         return current
 
     def T__277(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__277', parent, True) as rule:
             current = rule.current
-            current.src += 'True'
+            current.src += 'value >> []'
         return current
 
     def T__278(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__278', parent, True) as rule:
             current = rule.current
-            current.src += 'False'
+            current.src += 'value // ()'
         return current
 
     def T__279(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__279', parent, True) as rule:
             current = rule.current
-            current.src += '\"a\"'
+            current.src += 'value * mapping'
         return current
 
     def T__280(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__280', parent, True) as rule:
             current = rule.current
-            current.src += '\"ab\"'
+            current.src += 'value / []'
         return current
 
     def T__281(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__281', parent, True) as rule:
             current = rule.current
-            current.src += '\"abc\"'
+            current.src += 'value - built'
         return current
 
     def T__282(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__282', parent, True) as rule:
             current = rule.current
-            current.src += '\"xy\"'
+            current.src += 'total + {}'
         return current
 
     def T__283(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__283', parent, True) as rule:
             current = rule.current
-            current.src += '\"hello\"'
+            current.src += 'total - text'
         return current
 
     def T__284(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__284', parent, True) as rule:
             current = rule.current
-            current.src += 'b\"a\"'
+            current.src += 'total & text'
         return current
 
     def T__285(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__285', parent, True) as rule:
             current = rule.current
-            current.src += 'b\"ab\"'
+            current.src += 'total | mapping'
         return current
 
     def T__286(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__286', parent, True) as rule:
             current = rule.current
-            current.src += 'b\"xyz\"'
+            current.src += 'total ^ built'
         return current
 
     def T__287(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__287', parent, True) as rule:
             current = rule.current
-            current.src += 'b\"hello\"'
+            current.src += 'total / 0'
         return current
 
     def T__288(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__288', parent, True) as rule:
             current = rule.current
-            current.src += '\"0\"'
+            current.src += 'total // 0'
         return current
 
     def T__289(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__289', parent, True) as rule:
             current = rule.current
-            current.src += '\"1\"'
+            current.src += 'total % 0'
         return current
 
     def T__290(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__290', parent, True) as rule:
             current = rule.current
-            current.src += '\"12\"'
+            current.src += 'total << \"x\"'
         return current
 
     def T__291(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__291', parent, True) as rule:
             current = rule.current
-            current.src += '\"42\"'
+            current.src += 'total >> mapping'
         return current
 
     def T__292(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__292', parent, True) as rule:
             current = rule.current
-            current.src += '\"x\"'
+            current.src += 'pow(total, 1, 0)'
         return current
 
     def T__293(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__293', parent, True) as rule:
             current = rule.current
-            current.src += '\"xyz\"'
+            current.src += 'total ** {}'
         return current
 
     def T__294(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__294', parent, True) as rule:
             current = rule.current
-            current.src += '\"-\"'
+            current.src += 'complex(mapping)'
         return current
 
     def T__295(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__295', parent, True) as rule:
             current = rule.current
-            current.src += '\"ff\"'
+            current.src += 'roots + text'
         return current
 
     def T__296(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__296', parent, True) as rule:
             current = rule.current
-            current.src += '\"dead\"'
+            current.src += 'from_map[None]'
         return current
 
     def T__297(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__297', parent, True) as rule:
             current = rule.current
-            current.src += '\"k\"'
+            current.src += 'next(x for x in [])'
         return current
 
     def T__298(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__298', parent, True) as rule:
             current = rule.current
-            current.src += '\"name\"'
+            current.src += '-9'
         return current
 
     def T__299(self, parent: ParentRule | None = None) -> Rule:
         with UnlexerRuleContext(self, 'T__299', parent, True) as rule:
             current = rule.current
+            current.src += '-7'
+        return current
+
+    def T__300(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__300', parent, True) as rule:
+            current = rule.current
+            current.src += '-5'
+        return current
+
+    def T__301(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__301', parent, True) as rule:
+            current = rule.current
+            current.src += '-3'
+        return current
+
+    def T__302(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__302', parent, True) as rule:
+            current = rule.current
+            current.src += '-2'
+        return current
+
+    def T__303(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__303', parent, True) as rule:
+            current = rule.current
+            current.src += '-1'
+        return current
+
+    def T__304(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__304', parent, True) as rule:
+            current = rule.current
+            current.src += '0'
+        return current
+
+    def T__305(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__305', parent, True) as rule:
+            current = rule.current
+            current.src += '1'
+        return current
+
+    def T__306(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__306', parent, True) as rule:
+            current = rule.current
+            current.src += '2'
+        return current
+
+    def T__307(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__307', parent, True) as rule:
+            current = rule.current
+            current.src += '3'
+        return current
+
+    def T__308(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__308', parent, True) as rule:
+            current = rule.current
+            current.src += '4'
+        return current
+
+    def T__309(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__309', parent, True) as rule:
+            current = rule.current
+            current.src += '5'
+        return current
+
+    def T__310(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__310', parent, True) as rule:
+            current = rule.current
+            current.src += '7'
+        return current
+
+    def T__311(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__311', parent, True) as rule:
+            current = rule.current
+            current.src += '8'
+        return current
+
+    def T__312(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__312', parent, True) as rule:
+            current = rule.current
+            current.src += '10'
+        return current
+
+    def T__313(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__313', parent, True) as rule:
+            current = rule.current
+            current.src += '11'
+        return current
+
+    def T__314(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__314', parent, True) as rule:
+            current = rule.current
+            current.src += '16'
+        return current
+
+    def T__315(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__315', parent, True) as rule:
+            current = rule.current
+            current.src += '20'
+        return current
+
+    def T__316(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__316', parent, True) as rule:
+            current = rule.current
+            current.src += '32'
+        return current
+
+    def T__317(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__317', parent, True) as rule:
+            current = rule.current
+            current.src += 'True'
+        return current
+
+    def T__318(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__318', parent, True) as rule:
+            current = rule.current
+            current.src += 'False'
+        return current
+
+    def T__319(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__319', parent, True) as rule:
+            current = rule.current
+            current.src += '\"a\"'
+        return current
+
+    def T__320(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__320', parent, True) as rule:
+            current = rule.current
+            current.src += '\"ab\"'
+        return current
+
+    def T__321(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__321', parent, True) as rule:
+            current = rule.current
+            current.src += '\"abc\"'
+        return current
+
+    def T__322(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__322', parent, True) as rule:
+            current = rule.current
+            current.src += '\"xy\"'
+        return current
+
+    def T__323(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__323', parent, True) as rule:
+            current = rule.current
+            current.src += '\"hello\"'
+        return current
+
+    def T__324(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__324', parent, True) as rule:
+            current = rule.current
+            current.src += '\"delta\"'
+        return current
+
+    def T__325(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__325', parent, True) as rule:
+            current = rule.current
+            current.src += '\"orbit\"'
+        return current
+
+    def T__326(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__326', parent, True) as rule:
+            current = rule.current
+            current.src += 'b\"a\"'
+        return current
+
+    def T__327(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__327', parent, True) as rule:
+            current = rule.current
+            current.src += 'b\"ab\"'
+        return current
+
+    def T__328(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__328', parent, True) as rule:
+            current = rule.current
+            current.src += 'b\"xyz\"'
+        return current
+
+    def T__329(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__329', parent, True) as rule:
+            current = rule.current
+            current.src += 'b\"hello\"'
+        return current
+
+    def T__330(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__330', parent, True) as rule:
+            current = rule.current
+            current.src += 'b\"delta\"'
+        return current
+
+    def T__331(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__331', parent, True) as rule:
+            current = rule.current
+            current.src += '\"0\"'
+        return current
+
+    def T__332(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__332', parent, True) as rule:
+            current = rule.current
+            current.src += '\"1\"'
+        return current
+
+    def T__333(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__333', parent, True) as rule:
+            current = rule.current
+            current.src += '\"12\"'
+        return current
+
+    def T__334(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__334', parent, True) as rule:
+            current = rule.current
+            current.src += '\"20\"'
+        return current
+
+    def T__335(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__335', parent, True) as rule:
+            current = rule.current
+            current.src += '\"42\"'
+        return current
+
+    def T__336(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__336', parent, True) as rule:
+            current = rule.current
+            current.src += '\"99\"'
+        return current
+
+    def T__337(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__337', parent, True) as rule:
+            current = rule.current
+            current.src += '\"x\"'
+        return current
+
+    def T__338(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__338', parent, True) as rule:
+            current = rule.current
+            current.src += '\"xyz\"'
+        return current
+
+    def T__339(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__339', parent, True) as rule:
+            current = rule.current
+            current.src += '\"-\"'
+        return current
+
+    def T__340(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__340', parent, True) as rule:
+            current = rule.current
+            current.src += '\"nan\"'
+        return current
+
+    def T__341(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__341', parent, True) as rule:
+            current = rule.current
+            current.src += '\"ff\"'
+        return current
+
+    def T__342(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__342', parent, True) as rule:
+            current = rule.current
+            current.src += '\"dead\"'
+        return current
+
+    def T__343(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__343', parent, True) as rule:
+            current = rule.current
+            current.src += '\"beef\"'
+        return current
+
+    def T__344(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__344', parent, True) as rule:
+            current = rule.current
+            current.src += '\"k\"'
+        return current
+
+    def T__345(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__345', parent, True) as rule:
+            current = rule.current
+            current.src += '\"name\"'
+        return current
+
+    def T__346(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__346', parent, True) as rule:
+            current = rule.current
             current.src += '\"id\"'
+        return current
+
+    def T__347(self, parent: ParentRule | None = None) -> Rule:
+        with UnlexerRuleContext(self, 'T__347', parent, True) as rule:
+            current = rule.current
+            current.src += '\"tag\"'
         return current
 
 
@@ -3457,7 +3716,7 @@ class GrammarGenerator(Generator):
 
     _rule_sizes: ClassVar[dict[str, RuleSize]] = {
         'file': RuleSize(6, 15),
-        'program': RuleSize(5, 15),
+        'prog': RuleSize(5, 15),
         'math_prog': RuleSize(6, 32),
         'text_prog': RuleSize(6, 21),
         'collection_prog': RuleSize(4, 42),
@@ -3465,19 +3724,17 @@ class GrammarGenerator(Generator):
         'bytes_prog': RuleSize(6, 23),
         'convert_prog': RuleSize(6, 26),
         'path_prog': RuleSize(6, 15),
-        'deque_prog': RuleSize(4, 23),
-        'mixed_prog': RuleSize(4, 52),
+        'deque_prog': RuleSize(6, 23),
+        'mixed_prog': RuleSize(4, 54),
         'math_setup': RuleSize(3, 22),
         'text_setup': RuleSize(3, 11),
         'collection_setup': RuleSize(3, 32),
         'object_setup': RuleSize(3, 15),
         'bytes_setup': RuleSize(3, 13),
         'convert_setup': RuleSize(3, 16),
-        'regex_setup': RuleSize(2, 9),
-        'json_setup': RuleSize(2, 9),
         'path_setup': RuleSize(2, 9),
         'deque_setup': RuleSize(3, 13),
-        'mixed_setup': RuleSize(3, 46),
+        'mixed_setup': RuleSize(3, 48),
         'math_step': RuleSize(2, 3),
         'text_step': RuleSize(2, 3),
         'collection_step': RuleSize(2, 3),
@@ -3494,7 +3751,7 @@ class GrammarGenerator(Generator):
         'bytes_bad_site': RuleSize(5, 1),
         'convert_bad_site': RuleSize(5, 1),
         'path_bad_site': RuleSize(5, 1),
-        'deque_bad_site': RuleSize(2, 1),
+        'deque_bad_site': RuleSize(5, 1),
         'mixed_bad_site': RuleSize(2, 1),
         'wrap_math_expr': RuleSize(4, 1),
         'wrap_text_expr': RuleSize(4, 1),
@@ -3834,10 +4091,58 @@ class GrammarGenerator(Generator):
         'T__297': RuleSize(1, 1),
         'T__298': RuleSize(1, 1),
         'T__299': RuleSize(1, 1),
+        'T__300': RuleSize(1, 1),
+        'T__301': RuleSize(1, 1),
+        'T__302': RuleSize(1, 1),
+        'T__303': RuleSize(1, 1),
+        'T__304': RuleSize(1, 1),
+        'T__305': RuleSize(1, 1),
+        'T__306': RuleSize(1, 1),
+        'T__307': RuleSize(1, 1),
+        'T__308': RuleSize(1, 1),
+        'T__309': RuleSize(1, 1),
+        'T__310': RuleSize(1, 1),
+        'T__311': RuleSize(1, 1),
+        'T__312': RuleSize(1, 1),
+        'T__313': RuleSize(1, 1),
+        'T__314': RuleSize(1, 1),
+        'T__315': RuleSize(1, 1),
+        'T__316': RuleSize(1, 1),
+        'T__317': RuleSize(1, 1),
+        'T__318': RuleSize(1, 1),
+        'T__319': RuleSize(1, 1),
+        'T__320': RuleSize(1, 1),
+        'T__321': RuleSize(1, 1),
+        'T__322': RuleSize(1, 1),
+        'T__323': RuleSize(1, 1),
+        'T__324': RuleSize(1, 1),
+        'T__325': RuleSize(1, 1),
+        'T__326': RuleSize(1, 1),
+        'T__327': RuleSize(1, 1),
+        'T__328': RuleSize(1, 1),
+        'T__329': RuleSize(1, 1),
+        'T__330': RuleSize(1, 1),
+        'T__331': RuleSize(1, 1),
+        'T__332': RuleSize(1, 1),
+        'T__333': RuleSize(1, 1),
+        'T__334': RuleSize(1, 1),
+        'T__335': RuleSize(1, 1),
+        'T__336': RuleSize(1, 1),
+        'T__337': RuleSize(1, 1),
+        'T__338': RuleSize(1, 1),
+        'T__339': RuleSize(1, 1),
+        'T__340': RuleSize(1, 1),
+        'T__341': RuleSize(1, 1),
+        'T__342': RuleSize(1, 1),
+        'T__343': RuleSize(1, 1),
+        'T__344': RuleSize(1, 1),
+        'T__345': RuleSize(1, 1),
+        'T__346': RuleSize(1, 1),
+        'T__347': RuleSize(1, 1),
     }
 
     _alt_sizes: ClassVar[tuple[tuple[RuleSize, ...], ...]] = (
-        (RuleSize(6, 32), RuleSize(6, 21), RuleSize(4, 42), RuleSize(4, 25), RuleSize(6, 23), RuleSize(6, 26), RuleSize(6, 15), RuleSize(4, 23), RuleSize(4, 52)),  # 0
+        (RuleSize(6, 32), RuleSize(6, 21), RuleSize(4, 42), RuleSize(4, 25), RuleSize(6, 23), RuleSize(6, 26), RuleSize(6, 15), RuleSize(6, 23), RuleSize(4, 54)),  # 0
         (RuleSize(1, 5), RuleSize(1, 3), RuleSize(1, 7), RuleSize(1, 3), RuleSize(1, 3)),  # 1
         (RuleSize(1, 3), RuleSize(1, 7), RuleSize(1, 3), RuleSize(1, 3), RuleSize(1, 3)),  # 2
         (RuleSize(1, 3), RuleSize(1, 3), RuleSize(1, 7), RuleSize(1, 3), RuleSize(1, 3)),  # 3
@@ -3848,21 +4153,22 @@ class GrammarGenerator(Generator):
         (RuleSize(2, 5), RuleSize(1, 3), RuleSize(1, 3), RuleSize(1, 7), RuleSize(1, 3)),  # 8
         (RuleSize(1, 5), RuleSize(1, 3), RuleSize(1, 3), RuleSize(1, 7), RuleSize(1, 1)),  # 9
         (RuleSize(4, 1), RuleSize(1, 3)),  # 10
-        (RuleSize(4, 1), RuleSize(1, 1)),  # 11
-        (RuleSize(4, 1), RuleSize(1, 5)),  # 12
-        (RuleSize(2, 1), RuleSize(2, 2), RuleSize(2, 4), RuleSize(2, 4), RuleSize(2, 6), RuleSize(2, 10), RuleSize(2, 8), RuleSize(2, 8)),  # 13
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 14
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 15
+        (RuleSize(4, 1), RuleSize(1, 5)),  # 11
+        (RuleSize(2, 1), RuleSize(2, 2), RuleSize(2, 4), RuleSize(2, 4), RuleSize(2, 6), RuleSize(2, 10), RuleSize(2, 8), RuleSize(2, 8)),  # 12
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 13
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 14
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 15
         (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 16
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 17
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 18
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 19
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 20
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 21
-        (RuleSize(1, 1), RuleSize(1, 1)),  # 22
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 23
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 24
-        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 25
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 17
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 18
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 19
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 20
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 21
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 22
+        (RuleSize(1, 1), RuleSize(1, 1)),  # 23
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 24
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 25
+        (RuleSize(1, 1), RuleSize(1, 1), RuleSize(1, 1)),  # 26
     )
 
     _alt_conds: ClassVar[tuple[tuple[float, ...], ...]] = (
@@ -3870,14 +4176,17 @@ class GrammarGenerator(Generator):
         (1, 1, 1, 1, 1),  # 1
         (1, 1),  # 2
         (1, 1, 1, 1, 1, 1, 1, 1),  # 3
-        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 4
-        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 5
+        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 4
+        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 5
         (1, 1, 1, 1, 1, 1, 1),  # 6
-        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 7
-        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 8
-        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 9
-        (1, 1, 1, 1),  # 10
-        (1, 1, 1),  # 11
+        (1, 1, 1, 1, 1, 1),  # 7
+        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 8
+        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 9
+        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 10
+        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 11
+        (1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1),  # 12
+        (1, 1, 1, 1),  # 13
+        (1, 1, 1),  # 14
     )
 
     _quant_sizes: ClassVar[tuple[RuleSize, ...]] = (

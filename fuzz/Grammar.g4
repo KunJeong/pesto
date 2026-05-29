@@ -1,10 +1,10 @@
 grammar Grammar;
 
 file
-    : program EOF
+    : prog EOF
     ;
 
-program
+prog
     : math_prog
     | text_prog
     | collection_prog
@@ -107,21 +107,7 @@ convert_setup
       'item_text = ":".join(items)'
     ;
 
-regex_setup
-    : 'import re' NL
-      'text = "ab12cd34"' NL
-      'parts = re.split(r"\\d+", text)' NL
-      'found = re.findall(r"[a-z]+", text)' NL
-      'found_count = len(found)'
-    ;
 
-json_setup
-    : 'import json' NL
-      'payload = "{\\"a\\": 1, \\"b\\": 2}"' NL
-      'obj = json.loads(payload)' NL
-      'keys = list(obj)' NL
-      'key_count = len(keys)'
-    ;
 
 path_setup
     : 'from pathlib import Path' NL
@@ -154,7 +140,8 @@ mixed_setup
       '    return list(seq)' NL
       'built = build(nums)' NL
       'roots = [math.sqrt(x) for x in nums]' NL
-      'from_map = list(mapping.values())'
+      'from_map = list(mapping.values())' NL
+      'total = sum(nums)'
     ;
 
 math_step
@@ -297,7 +284,7 @@ object_bad_site : wrap_object_expr | 'with box as ctx:' NL '    pass' ;
 bytes_bad_site : wrap_bytes_expr ;
 convert_bad_site : wrap_convert_expr ;
 path_bad_site : wrap_path_expr ;
-deque_bad_site : wrap_deque_expr | 'raise NotImplementedError("todo")' ;
+deque_bad_site : wrap_deque_expr ;
 mixed_bad_site : wrap_mixed_expr | 'def boom():' NL '    x = x + 1' NL 'boom()' ;
 
 wrap_math_expr : wrap_math_base ;
@@ -414,12 +401,31 @@ math_bad_expr
     | 'roots[None]'
     | 'math.sqrt("x")'
     | 'math.log(-1.0)'
+    | 'math.factorial(-1)'
+    | 'math.isqrt(-1)'
     | 'value < 1j'
     | 'range("x")'
     | 'pow(1, 1, 0)'
     | '1 / 0'
+    | '1 // 0'
+    | '1 % 0'
     | 'divmod(1, 0)'
     | 'math.exp(1000)'
+    | 'math.cosh(1000)'
+    | 'math.ldexp(1.0, 100000)'
+    | 'float(10 ** 1000)'
+    | '1 << -1'
+    | '1 >> -1'
+    | 'value << "x"'
+    | 'value >> {}'
+    | 'value // "x"'
+    | 'value // []'
+    | 'value % ()'
+    | 'value % {}'
+    | 'value * {}'
+    | 'value - []'
+    | 'value - ()'
+    | 'nums[0] + {}'
     ;
 
 text_bad_expr
@@ -431,8 +437,6 @@ text_bad_expr
     | 'chr(text)'
     | 'text.index("zzz")'
     | 'text.encode(1)'
-    | 'text.encode("nope")'
-    | '"\u20ac".encode("ascii")'
     ;
 
 collection_bad_expr
@@ -447,6 +451,15 @@ collection_bad_expr
     | 'copy.remove(99)'
     | 'pair + {}'
     | 'nums - {}'
+    | 'nums[0] + {}'
+    | 'nums[1] // 0'
+    | 'nums[1] % 0'
+    | 'nums[0] << "x"'
+    | 'nums[0] >> ()'
+    | 'nums[2] / []'
+    | 'nums[0] / 0'
+    | 'nums[2] ** {}'
+    | 'pair * {}'
     | 'sum(1)'
     | 'next(iter([]))'
     | 'next(iter(()))'
@@ -469,8 +482,6 @@ bytes_bad_expr
     | 'blob + {}'
     | 'memoryview(1)'
     | 'text.encode(1)'
-    | 'text.encode("nope")'
-    | '"\u20ac".encode("ascii")'
     ;
 
 convert_bad_expr
@@ -482,6 +493,7 @@ convert_bad_expr
     | 'bytes([999])'
     | 'bytearray("x")'
     | 'chr(-1)'
+    | 'pow(10, 1000, 0)'
     | 'float(10 ** 1000)'
     | 'bytes.fromhex("zz")'
     | 'int("xyz")'
@@ -498,8 +510,6 @@ path_bad_expr
     | 'p.with_name("")'
     | 'child / 1'
     | 'p.read_text(encoding=1)'
-    | 'Path(".").read_text()'
-    | 'Path(".").mkdir()'
     | '1 / 0'
     ;
 
@@ -524,6 +534,28 @@ mixed_bad_expr
     | 'box + mapping'
     | 'iter(1)'
     | 'divmod(1, 0)'
+    | '1 // 0'
+    | '1 % 0'
+    | 'value << "x"'
+    | 'value >> []'
+    | 'value % {}'
+    | 'value // ()'
+    | 'value * mapping'
+    | 'value / []'
+    | 'value - built'
+    | 'total + {}'
+    | 'total - text'
+    | 'total & text'
+    | 'total | mapping'
+    | 'total ^ built'
+    | 'total / 0'
+    | 'total // 0'
+    | 'total % 0'
+    | 'total << "x"'
+    | 'total >> mapping'
+    | '1 << -1'
+    | 'pow(total, 1, 0)'
+    | 'total ** {}'
     | 'complex(mapping)'
     | 'roots + text'
     | 'from_map[None]'
@@ -533,15 +565,25 @@ mixed_bad_expr
     ;
 
 num_lit
-    : '-3'
+    : '-9'
+    | '-7'
+    | '-5'
+    | '-3'
+    | '-2'
     | '-1'
     | '0'
     | '1'
     | '2'
     | '3'
     | '4'
+    | '5'
     | '7'
+    | '8'
     | '10'
+    | '11'
+    | '16'
+    | '20'
+    | '32'
     ;
 
 pos_num_lit
@@ -550,8 +592,14 @@ pos_num_lit
     | '2'
     | '3'
     | '4'
+    | '5'
     | '7'
+    | '8'
     | '10'
+    | '11'
+    | '16'
+    | '20'
+    | '32'
     ;
 
 bool_lit
@@ -565,6 +613,8 @@ str_lit
     | '"abc"'
     | '"xy"'
     | '"hello"'
+    | '"delta"'
+    | '"orbit"'
     ;
 
 bytes_lit
@@ -572,24 +622,29 @@ bytes_lit
     | 'b"ab"'
     | 'b"xyz"'
     | 'b"hello"'
+    | 'b"delta"'
     ;
 
 digit_text_lit
     : '"0"'
     | '"1"'
     | '"12"'
+    | '"20"'
     | '"42"'
+    | '"99"'
     ;
 
 bad_text_lit
     : '"x"'
     | '"xyz"'
     | '"-"'
+    | '"nan"'
     ;
 
 hex_text_lit
     : '"ff"'
     | '"dead"'
+    | '"beef"'
     ;
 
 key_lit
@@ -597,6 +652,7 @@ key_lit
     | '"x"'
     | '"name"'
     | '"id"'
+    | '"tag"'
     ;
 
 NL
