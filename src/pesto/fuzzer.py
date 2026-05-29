@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
-import argparse
+"""Grammar-based fuzzer that emits Python programs which crash at runtime."""
+
 import ast
 import random
 import shutil
@@ -7,8 +7,8 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-WD = Path(__file__).resolve().parent
-GRAMMAR = WD / 'Grammar.g4'
+from . import paths
+
 GENERATOR = 'GrammarGenerator.GrammarGenerator'
 PYTHON = 'python3'
 JOBS = 4
@@ -81,13 +81,13 @@ def compose_programs(programs: list[str], rng: random.Random) -> str:
 
 
 class Session:
-    def __init__(self, args: argparse.Namespace):
-        self.target = int(args.n)
-        self.round_limit = int(args.rounds)
-        self.outdir = Path(args.outdir).resolve()
+    def __init__(self, n: int, rounds: int, outdir, seed: int | None = None):
+        self.target = int(n)
+        self.round_limit = int(rounds)
+        self.outdir = Path(outdir).resolve()
         self.base = self.outdir.parent
         self.resultdir = self.outdir / 'results'
-        self.next_seed = args.seed if args.seed is not None else random.randrange(2**31)
+        self.next_seed = seed if seed is not None else random.randrange(2**31)
         self.next_case_id = 0
         self.seen: set[str] = set()
         self.stats = {'ok': 0, 'runtime': 0, 'syntax': 0, 'timeout': 0}
@@ -151,7 +151,7 @@ class Session:
             run_cmd([
                 'grammarinator-generate',
                 GENERATOR,
-                '--sys-path', str(WD),
+                '--sys-path', str(paths.GRAMMAR_DIR),
                 '-n', str(batch),
                 '-o', str(tempdir / 'case_%d.py'),
                 '-j', str(JOBS),
@@ -180,7 +180,7 @@ class Session:
                 self.keep_case(text)
         return self.next_case_id - kept_before
 
-    def run_pipeline(self):
+    def run_pipeline(self) -> int:
         self.setup()
         rounds = 0
         while self.next_case_id < self.target and (self.round_limit <= 0 or rounds < self.round_limit):
@@ -189,38 +189,23 @@ class Session:
         print(
             f'rounds={rounds} requested={self.target} kept={self.next_case_id} total={self.total}'
         )
+        return self.next_case_id
 
-def proc(_: argparse.Namespace):
+
+def process_grammar():
+    """Compile grammar/Grammar.g4 into the Grammarinator generator module."""
     run_cmd([
         'grammarinator-process',
-        '-g', str(GRAMMAR),
+        '-g', str(paths.GRAMMAR_FILE),
         '--language', 'py',
-        '-o', str(WD),
+        '-o', str(paths.GRAMMAR_DIR),
         '-r', 'file',
     ])
 
 
-def gen(args: argparse.Namespace):
-    Session(args).run_pipeline()
-
-
-def main():
-    parser = argparse.ArgumentParser()
-    sub = parser.add_subparsers(dest='cmd', required=True)
-
-    proc_parser = sub.add_parser('proc')
-    proc_parser.set_defaults(fn=proc)
-
-    gen_parser = sub.add_parser('gen')
-    gen_parser.add_argument('-n', type=int, default=20)
-    gen_parser.add_argument('--rounds', type=int, default=100)
-    gen_parser.add_argument('--seed', type=int)
-    gen_parser.add_argument('--outdir', default=str(WD / 'cases'))
-    gen_parser.set_defaults(fn=gen)
-
-    args = parser.parse_args()
-    args.fn(args)
-
-
-if __name__ == '__main__':
-    main()
+def generate(n: int = 20, rounds: int = 100, outdir=None, seed: int | None = None):
+    """Generate ``n`` crashing programs into ``outdir``; return (outdir, kept)."""
+    outdir = Path(outdir) if outdir else paths.DEFAULT_PIPELINE_DIR / 'generated'
+    session = Session(n, rounds, outdir, seed)
+    kept = session.run_pipeline()
+    return session.outdir, kept

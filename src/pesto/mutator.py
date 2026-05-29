@@ -6,10 +6,10 @@ import pycparser
 import pycparser.c_ast as c_ast
 from pycparser import c_generator
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-CPYTHON_ROOT = PROJECT_ROOT / "vendor" / "cpython"
+from . import paths
 
-CPYTHON_HEADERS = Path(__file__).parent / "cpython_headers"
+CPYTHON_ROOT = paths.VENDOR_CPYTHON
+CPYTHON_HEADERS = paths.CPYTHON_HEADERS
 
 CPYTHON_DEFINES = [
     "-DPy_BUILD_CORE",

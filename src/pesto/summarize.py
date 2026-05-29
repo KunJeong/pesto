@@ -1,17 +1,12 @@
-#!/usr/bin/env python3
-import argparse
+"""Summarize exception classes and messages from fuzzer ``.err`` logs."""
+
 from collections import Counter
 from pathlib import Path
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser(
-        description="Summarize exception classes from .err files."
-    )
-    parser.add_argument("input_dir", help="Directory containing .err files")
-    args = parser.parse_args()
-
-    root = Path(args.input_dir)
+def summarize_errors(input_dir) -> int:
+    """Print exception-class and final-message distributions for ``*.err`` files."""
+    root = Path(input_dir)
     class_counts = Counter()
     message_counts = Counter()
 
@@ -36,6 +31,4 @@ def main() -> None:
     for message, count in message_counts.most_common():
         print(f"{count}\t{message}")
 
-
-if __name__ == "__main__":
-    main()
+    return 0

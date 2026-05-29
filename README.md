@@ -1,126 +1,80 @@
+# PESTO
+
+**P**arametric **E**xecution-path-**S**ensitivity for **T**est **O**ptimization.
+
+PESTO fuzzes Python programs that crash CPython, reduces each one while
+preserving its native crash signature, deduplicates by AST, then measures how
+well the resulting suite kills mutants of a CPython core source file.
+
+## Setup
+
+```bash
+pip install -e .                      # installs pesto + pycparser + grammarinator
+./scripts/build-patched-cpython.sh    # builds the instrumented interpreter under vendor/cpython
+./scripts/install-perses.sh           # downloads perses_deploy.jar into perses/
+```
+
+The reducer also needs a Java runtime (Perses) on the `PATH`.
+
 ## Usage
 
-### Trace
+Run the CLI as `python src/pesto/cli.py <command>`. The commands are:
 
 ```bash
-# full trace, excluding memory location
-./vendor/cpython/python.exe tests/add_1.py 2>&1 | sed 's/0x[0-9a-fA-F]*//g' > add_1.txt
-# trace summary with sensitivity 10
-python3 src/pesto/cli.py trace tests/add_1.py
+pipeline [WORKDIR]              # run the whole flow end to end
+trace PROGRAM [-s N]           # print the crash signature (N native frames)
+fuzz-proc                      # compile the fuzzing grammar (run once / after editing it)
+fuzz -n N [--rounds R] [--seed S] [-o DIR]
+reduce -o DIR [-i FILE | --input-dir DIR] [-s N] [-j JOBS]
+dedup INPUT_DIR OUTPUT_DIR     # keep one program per unique AST
+summarize INPUT_DIR            # exception statistics from fuzzer .err logs
+mutate (FILE.c ... | --config JSON) [-I DIR] [-m N ...]
+mutate-cpython ([FILE] | --config JSON) [-m N ...]
+evaluate [--sample N] [--seed N] [--timeout S] [--tests-dir DIR]
 ```
 
-### Mutate
+Mutation operators for `-m` (default `1 2 3 7`):
+`1=ORRN 2=VTWD 3=VDTR 4=OASN 5=OLBN 6=SWDD 7=SSDL 8=Ccrc 9=Ccrs`.
 
-Mutation type numbers: `1=ORRN 2=VTWD 3=VDTR 4=OASN 5=OLBN 6=SWDD 7=SSDL 8=Ccrc 9=Ccrs` (default: 1 2 3 7)
+### Targeted multi-file mutation
 
-**All functions in a file (original behaviour):**
-```bash
-python3 src/pesto/cli.py mutate test.c [-I DIR] [-m N ...]
-```
+`mutate` and `mutate-cpython` accept `--config JSON` to mutate specific
+functions across several files. The config maps each file to a list of function
+names, or `null` for every function in that file (`mutate-cpython` paths are
+relative to `vendor/cpython/`):
 
-**Specific functions across multiple files via JSON config:**
-```bash
-python3 src/pesto/cli.py mutate --config targets.json [-I DIR] [-m N ...]
-```
-
-Config format — keys are file paths, values are function lists (`null` = all functions in that file):
-```json
-{
-  "src/foo.c": ["add", "sub"],
-  "src/bar.c": null
-}
-```
-
-Output written to `pesto_mutation/`:
-- `<stem>.c` and `<stem>.meta.json` per file
-- `pesto.json` — unified metadata with globally unique mutation IDs across all files
-- `pesto_runtime.c` — shared runtime
-
-```bash
-# compile and run
-gcc pesto_mutation/foo.c pesto_mutation/bar.c pesto_mutation/pesto_runtime.c -o mutant
-PESTO_MUTANT_ID=-1 ./mutant   # original
-PESTO_MUTANT_ID=0  ./mutant   # mutation #0
-```
-
-### Mutate CPython
-
-**Single file (original behaviour):**
-```bash
-python3 src/pesto/cli.py mutate-cpython [Objects/longobject.c] [-m N ...]
-```
-
-**Specific functions across multiple CPython files:**
-```bash
-python3 src/pesto/cli.py mutate-cpython --config targets.json [-m N ...]
-```
-
-Config format — paths relative to `vendor/cpython/`:
 ```json
 {
   "Objects/longobject.c": ["PyLong_FromLong", "PyLong_AsLong"],
-  "Objects/floatobject.c": ["PyFloat_AsDouble", "float_richcompare"]
+  "Objects/floatobject.c": null
 }
 ```
 
-Mutates files in-place, patches the Makefile, and builds:
-```bash
-# re-run after editing config (remove pesto.json to re-mutate)
-rm vendor/cpython/pesto.json
-python3 src/pesto/cli.py mutate-cpython --config targets.json
-```
+Mutation IDs are globally unique across all files, and a unified `pesto.json`
+(with per-file `id_range` entries) is written alongside the per-file output.
 
-### Evaluate
+### End-to-end pipeline
 
-```bash
-python3 src/pesto/cli.py evaluate [--sample N] [--seed N] [--timeout S]
-```
-
-## Running Perses Reducer
-
-Download the prebuilt Perses jar before running the reducer:
+Build the mutant set once with `mutate-cpython`, then run the loop that scores a
+suite against it:
 
 ```bash
-./scripts/install-perses.sh
+python src/pesto/cli.py mutate-cpython   # one-time: build the mutated interpreter + pesto.json
+python src/pesto/cli.py pipeline         # fuzz -> reduce -> dedup -> evaluate
 ```
 
-The script downloads `perses_deploy.jar` from [uw-pluverse/perses](https://github.com/uw-pluverse/perses/releases/download/v2.5/perses_deploy.jar)
-and stores it under `perses/`.
-
-Run the reducer driver from the project root:
+Each stage writes into `<workdir>/{generated,reduced,dedup}` and any stage can
+be skipped to reuse prior output, e.g. re-evaluate without re-fuzzing:
 
 ```bash
-python3 scripts/run-reducers.py -o [RESULTS_DIR]
+python src/pesto/cli.py pipeline --skip-fuzz --skip-reduce --skip-dedup
 ```
 
-You can also run the reducer on all Python files in a specific directory:
+### Layout
 
-```bash
-python3 scripts/run-reducers.py -d [INPUT_DIR] -o [RESULTS_DIR]
-```
-
-You can also run the reducer on one specific input file:
-
-```bash
-python3 scripts/run-reducers.py -i [INPUT_PYTHON_PROGRAM] -o [RESULTS_DIR]
-```
-
-You can also specify the trace sensitivity (default is 10):
-
-```bash
-python3 scripts/run-reducers.py -i [INPUT_PYTHON_PROGRAM] -o [RESULTS_DIR] -ts [TRACE_SENSITIVITY]
-```
-
-You can also control how many input files are reduced in parallel:
-
-```bash
-python3 scripts/run-reducers.py -o [RESULTS_DIR] -j [JOBS]
-```
-
-## Deduplicating Reduced Programs
-
-Keep one representative per unique AST:
-
-```bash
-python3 scripts/dedup.py -i reduced -o dedup
-```
+- `src/pesto/` — the toolchain package (one module per stage + `cli`, `pipeline`, `paths`)
+- `src/pesto/grammar/` — ANTLR grammar and generated Grammarinator generator
+- `src/pesto/data/test-script.sh` — Perses interestingness oracle
+- `scripts/` — one-time environment setup (patched CPython, Perses)
+- `samples/test.c` — sample C file exercising every mutation operator
+- `tests/` — sample crashing programs and fuzzer output

@@ -1,94 +1,89 @@
+"""Unified command-line interface for the PESTO toolchain."""
+
 import argparse
 import json
-import os
-import platform
-import re
-import subprocess
 import sys
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
-PATCHED_CPYTHON_ROOT = PROJECT_ROOT / "vendor" / "cpython"
-_TRACE_SKIP = 4366
+# Allow running as ``python src/pesto/cli.py`` by putting src/ on the path.
+if __package__ in (None, ""):
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-# Patched CPython is built as `python.exe` on macOS and `python` on Linux/WSL,
-# and backtrace_symbols_fd() formats frames differently on each platform.
-_IS_DARWIN = platform.system() == "Darwin"
-_PATCHED_PYTHON = PATCHED_CPYTHON_ROOT / ("python.exe" if _IS_DARWIN else "python")
-_LINUX_FRAME_RE = re.compile(r"\(([^+)]+)\+")
-
-
-def extract_frame(line: str):
-    if _IS_DARWIN:
-        # "0   python.exe   0x...   _PyErr_SetObject + 212"
-        parts = line.split()
-        return parts[3] if len(parts) >= 4 else None
-    # glibc: "python(_PyErr_SetObject+0x...) [0x...]"
-    m = _LINUX_FRAME_RE.search(line)
-    return m.group(1) if m else None
-
-
-def cmd_trace(args: argparse.Namespace):
-    result = subprocess.run(
-        [str(_PATCHED_PYTHON), args.target],
-        capture_output=True,
-        text=True,
-    )
-
-    python_traceback_summary = next(
-        line for line in reversed(result.stderr.splitlines()) if line.strip()
-    )
-    escaping_exception_type = python_traceback_summary.split(":", 1)[0].strip()
-
-    pesto_block_re = re.compile(
-        rf"\[PESTO-BEGIN type={re.escape(escaping_exception_type)}\](.*?)\[PESTO-END\]",
-        re.DOTALL,
-    )
-
-    traces = "\n".join(result.stderr.splitlines()[_TRACE_SKIP:])
-    first_matching_block = pesto_block_re.findall(traces)[0]
-
-    frames = [f for line in first_matching_block.strip().splitlines()
-              if (f := extract_frame(line)) is not None]
-
-    print(f"{escaping_exception_type} | " + " ; ".join(frames[: args.sensitivity]))
+from pesto import (
+    cpython_build,
+    dedup,
+    evaluator,
+    fuzzer,
+    mutator,
+    pipeline,
+    reducer,
+    summarize,
+    tracer,
+)
 
 
 def _parse_mutations(numbers):
-    from mutator import ALL_MUTATION_TYPES
     result = []
     for n in numbers:
-        if not (1 <= n <= len(ALL_MUTATION_TYPES)):
+        if not (1 <= n <= len(mutator.ALL_MUTATION_TYPES)):
             raise SystemExit(
-                f"Invalid mutation number {n}. Valid: 1–{len(ALL_MUTATION_TYPES)} "
-                f"({', '.join(f'{i+1}={t}' for i, t in enumerate(ALL_MUTATION_TYPES))})"
+                f"Invalid mutation number {n}. Valid: 1–{len(mutator.ALL_MUTATION_TYPES)} "
+                f"({', '.join(f'{i+1}={t}' for i, t in enumerate(mutator.ALL_MUTATION_TYPES))})"
             )
-        result.append(ALL_MUTATION_TYPES[n - 1])
+        result.append(mutator.ALL_MUTATION_TYPES[n - 1])
     return result
+
+
+def cmd_trace(args):
+    print(tracer.trace_summary(args.target, args.sensitivity))
+
+
+def cmd_fuzz_proc(args):
+    fuzzer.process_grammar()
+
+
+def cmd_fuzz(args):
+    outdir, kept = fuzzer.generate(
+        n=args.n, rounds=args.rounds, outdir=args.outdir, seed=args.seed
+    )
+    print(f"kept {kept} crashing program(s) in {outdir}")
+    return 0 if kept else 1
+
+
+def cmd_reduce(args):
+    return reducer.reduce_all(
+        output=args.output,
+        inputs=args.input,
+        input_dir=args.input_dir,
+        sensitivity=args.sensitivity,
+        jobs=args.jobs,
+    )
+
+
+def cmd_dedup(args):
+    return dedup.dedup(args.input_dir, args.output_dir)
+
+
+def cmd_summarize(args):
+    return summarize.summarize_errors(args.input_dir)
 
 
 def _load_config(config_path):
     with open(config_path) as f:
         raw = json.load(f)
     if not isinstance(raw, dict):
-        raise SystemExit(f"Config must be a JSON object mapping file paths to function lists.")
-    return raw 
+        raise SystemExit("Config must be a JSON object mapping file paths to function lists.")
+    return raw
 
 
-def cmd_mutate(args: argparse.Namespace):
-    from mutator import mutate_file
-
+def cmd_mutate(args):
     if args.config and args.c_files:
         raise SystemExit("error: --config and positional c_files are mutually exclusive")
     if not args.config and not args.c_files:
         raise SystemExit("error: provide either c_files or --config")
 
     enabled = _parse_mutations(args.mutations) if args.mutations else None
-
-    if args.config:
-        targets = _load_config(args.config)
-    else:
-        targets = {f: None for f in args.c_files}
+    targets = _load_config(args.config) if args.config else {f: None for f in args.c_files}
 
     out_dir = Path.cwd() / "pesto_mutation"
     out_dir.mkdir(exist_ok=True)
@@ -100,12 +95,11 @@ def cmd_mutate(args: argparse.Namespace):
     id_offset = 0
 
     for c_file, func_list in targets.items():
-        target_functions = func_list if func_list is not None else None
-        mutated_code, runtime_code, mutation_count, mutations = mutate_file(
+        mutated_code, runtime_code, mutation_count, mutations = mutator.mutate_file(
             c_file,
             include_paths=args.include or [],
             enabled_mutations=enabled,
-            target_functions=target_functions,
+            target_functions=func_list,
             id_offset=id_offset,
         )
         stem = Path(c_file).stem
@@ -128,158 +122,27 @@ def cmd_mutate(args: argparse.Namespace):
         all_mutations.extend(mutations)
         id_offset += mutation_count
 
-    unified_meta = {
-        "mutation_count": id_offset,
-        "mutations": all_mutations,
-        "files": file_entries,
-    }
+    unified_meta = {"mutation_count": id_offset, "mutations": all_mutations, "files": file_entries}
     (out_dir / "pesto.json").write_text(json.dumps(unified_meta, indent=2))
 
     print(f"Compile: gcc {' '.join(str(p) for p in mutated_paths)} {out_dir}/pesto_runtime.c -o mutant")
     print("Run:     PESTO_MUTANT_ID=<id> ./mutant  (-1 = original)")
 
 
-def cmd_mutate_cpython(args: argparse.Namespace):
-    from mutator import mutate_file, CPYTHON_DEFINES, CPYTHON_HEADERS
-
-    sys.setrecursionlimit(50000)
-
-    if not PATCHED_CPYTHON_ROOT.exists():
-        sys.exit(f"Patched CPython not found. Run: scripts/build-patched-cpython.sh")
-
-    include_paths = [
-        str(CPYTHON_HEADERS),
-        str(PATCHED_CPYTHON_ROOT),
-        str(PATCHED_CPYTHON_ROOT / "Include"),
-        str(PATCHED_CPYTHON_ROOT / "Include" / "cpython"),
-        str(PATCHED_CPYTHON_ROOT / "Include" / "internal"),
-    ]
-
-    enabled = _parse_mutations(args.mutations) if args.mutations else None
-
-    meta_path = PATCHED_CPYTHON_ROOT / "pesto.json"
-
+def cmd_mutate_cpython(args):
     if args.config and args.file:
         raise SystemExit("error: --config and positional file are mutually exclusive")
 
-    if args.config:
-        raw_targets = _load_config(args.config)
-        targets = {rel: (funcs if funcs is not None else None) for rel, funcs in raw_targets.items()}
-    else:
-        targets = {(args.file or "Objects/longobject.c"): None}
-
-    if meta_path.exists():
-        print("Already mutated, skipping mutation step.")
-    else:
-        all_mutations = []
-        file_entries = []
-        id_offset = 0
-        runtime_written = False
-
-        for rel_file, func_list in targets.items():
-            target = PATCHED_CPYTHON_ROOT / rel_file
-            print(f"Mutating {rel_file} ...")
-            try:
-                mutated_code, runtime_code, mutation_count, mutations = mutate_file(
-                    str(target),
-                    cpp_args=CPYTHON_DEFINES,
-                    include_paths=include_paths,
-                    enabled_mutations=enabled,
-                    target_functions=func_list,
-                    id_offset=id_offset,
-                )
-                target.write_text(mutated_code)
-                if not runtime_written:
-                    (target.parent / "pesto_runtime.c").write_text(runtime_code)
-                    runtime_written = True
-                print(f"Done: {mutation_count} mutations in {rel_file}")
-            except Exception as e:
-                msg = str(e).splitlines()[0][:80]
-                print(f"Failed [{type(e).__name__}] {msg}")
-                return
-
-            file_entries.append({
-                "file": str(PATCHED_CPYTHON_ROOT / rel_file),
-                "mutation_count": mutation_count,
-                "id_range": [id_offset, id_offset + mutation_count - 1] if mutation_count else [],
-            })
-            all_mutations.extend(mutations)
-            id_offset += mutation_count
-
-        unified_meta = {
-            "mutation_count": id_offset,
-            "mutations": all_mutations,
-            "files": file_entries,
-        }
-        meta_path.write_text(json.dumps(unified_meta, indent=2))
-
-    first_rel = next(iter(targets))
-    first_target = PATCHED_CPYTHON_ROOT / first_rel
-    runtime_rel = first_target.parent.relative_to(PATCHED_CPYTHON_ROOT)
-    runtime_obj = f"{runtime_rel}/pesto_runtime.o"
-    runtime_src = f"{runtime_rel}/pesto_runtime.c"
-
-    makefile = PATCHED_CPYTHON_ROOT / "Makefile"
-    content = makefile.read_text()
-    additions = ""
-    if "# PESTO additions" not in content:
-        additions += (
-            f"\n# PESTO additions\n"
-            f"OBJECT_OBJS += {runtime_obj}\n\n"
-            f"{runtime_obj}: {runtime_src}\n"
-            f"\t$(CC) -c -O2 -o $@ $<\n"
-        )
-
-    mutated_objs = []
-    for rel_file in targets:
-        t = PATCHED_CPYTHON_ROOT / rel_file
-        t_rel = t.parent.relative_to(PATCHED_CPYTHON_ROOT)
-        mutated_obj = f"{t_rel}/{t.stem}.o"
-        mutated_src = f"{t_rel}/{t.stem}.c"
-        mutated_objs.append(mutated_obj)
-        if f"{mutated_obj}:" not in content:
-            additions += (
-                f"\n{mutated_obj}: {mutated_src}\n"
-                f"\t$(CC) $(filter-out -O%,$(PY_CORE_CFLAGS)) -O0 -c -o $@ $<\n"
-            )
-
-    all_objs = " ".join([runtime_obj] + mutated_objs)
-    pesto_build_entry = (
-        f"\n.PHONY: pesto-build\n"
-        f"pesto-build: {all_objs}\n"
-        f"\t$(AR) r $(BLDLIBRARY) {all_objs}\n"
-        f"\t$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $(BUILDPYTHON)"
-        f" Programs/python.o $(LINK_PYTHON_OBJS) $(LIBS) $(MODLIBS) $(SYSLIBS)\n"
+    enabled = _parse_mutations(args.mutations) if args.mutations else None
+    targets = _load_config(args.config) if args.config else None
+    built = cpython_build.build_mutated_cpython(
+        file=args.file or "Objects/longobject.c", mutations=enabled, targets=targets
     )
-    if pesto_build_entry not in content:
-        if "pesto-build:" in content:
-            import re as _re
-            content = _re.sub(
-                r"\n\.PHONY: pesto-build\npesto-build:.*?\n\t.*?\n\t.*?\n",
-                "",
-                content,
-            )
-            makefile.write_text(content)
-        additions += pesto_build_entry
-    if additions:
-        makefile.write_text(content + additions)
-        print("Patched Makefile.")
-
-    print(f"Building mutated CPython ...")
-    result = subprocess.run(
-        ["make", "-C", str(PATCHED_CPYTHON_ROOT), f"-j{os.cpu_count() or 4}", "pesto-build"],
-    )
-    if result.returncode == 0:
-        print(f"\nBuild complete: {PATCHED_CPYTHON_ROOT}/python")
-        print(f"Evaluate: pesto evaluate")
-    else:
-        print(f"\nBuild failed.")
+    return 0 if built else 1
 
 
-def cmd_evaluate(args: argparse.Namespace):
-    from evaluator import run_evaluation
-
-    run_evaluation(
+def cmd_evaluate(args):
+    evaluator.run_evaluation(
         sample=args.sample,
         seed=args.seed,
         timeout=args.timeout,
@@ -289,39 +152,105 @@ def cmd_evaluate(args: argparse.Namespace):
     )
 
 
+def cmd_pipeline(args):
+    return pipeline.run_pipeline(
+        args.workdir,
+        n=args.n,
+        rounds=args.rounds,
+        seed=args.seed,
+        sensitivity=args.sensitivity,
+        jobs=args.jobs,
+        sample=args.sample,
+        eval_seed=args.eval_seed,
+        timeout=args.timeout,
+        skip_fuzz=args.skip_fuzz,
+        skip_reduce=args.skip_reduce,
+        skip_dedup=args.skip_dedup,
+        skip_evaluate=args.skip_evaluate,
+    )
+
+
+def build_parser():
+    parser = argparse.ArgumentParser(prog="pesto", description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    p = sub.add_parser("trace", help="print the crash signature of a Python program")
+    p.add_argument("target")
+    p.add_argument("-s", "--sensitivity", type=int, default=1)
+    p.set_defaults(func=cmd_trace)
+
+    p = sub.add_parser("fuzz-proc", help="compile the fuzzing grammar")
+    p.set_defaults(func=cmd_fuzz_proc)
+
+    p = sub.add_parser("fuzz", help="generate crashing Python programs")
+    p.add_argument("-n", type=int, default=20)
+    p.add_argument("--rounds", type=int, default=100)
+    p.add_argument("-o", "--outdir", default=None)
+    p.add_argument("--seed", type=int, default=None)
+    p.set_defaults(func=cmd_fuzz)
+
+    p = sub.add_parser("reduce", help="reduce crashing programs with Perses")
+    p.add_argument("-o", "--output", required=True, metavar="DIR")
+    p.add_argument("-i", "--input", default=None, metavar="FILE")
+    p.add_argument("--input-dir", default=None, metavar="DIR")
+    p.add_argument("-s", "--sensitivity", type=int, default=reducer.DEFAULT_TRACE_SENSITIVITY)
+    p.add_argument("-j", "--jobs", type=int, default=reducer.DEFAULT_REDUCER_JOBS)
+    p.set_defaults(func=cmd_reduce)
+
+    p = sub.add_parser("dedup", help="keep one program per unique AST")
+    p.add_argument("input_dir")
+    p.add_argument("output_dir")
+    p.set_defaults(func=cmd_dedup)
+
+    p = sub.add_parser("summarize", help="summarize exceptions from fuzzer .err logs")
+    p.add_argument("input_dir")
+    p.set_defaults(func=cmd_summarize)
+
+    p = sub.add_parser("mutate", help="mutate plain C files and emit a compile recipe")
+    p.add_argument("c_files", nargs="*")
+    p.add_argument("--config", metavar="JSON", help="JSON map of file -> function list (null = all)")
+    p.add_argument("-I", "--include", metavar="DIR", action="append")
+    p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
+    p.set_defaults(func=cmd_mutate)
+
+    p = sub.add_parser("mutate-cpython", help="mutate CPython source file(s) and rebuild")
+    p.add_argument("file", nargs="?", default=None)
+    p.add_argument("--config", metavar="JSON", help="JSON map of cpython-relative file -> function list (null = all)")
+    p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
+    p.set_defaults(func=cmd_mutate_cpython)
+
+    p = sub.add_parser("evaluate", help="compute the mutation score of a test suite")
+    p.add_argument("--sample", type=int, default=None)
+    p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--timeout", type=float, default=10.0)
+    p.add_argument("--tests-dir", default=None, metavar="DIR")
+    p.add_argument("--binary", default=None, metavar="PATH")
+    p.add_argument("--meta", default=None, metavar="PATH")
+    p.set_defaults(func=cmd_evaluate)
+
+    p = sub.add_parser("pipeline", help="run the full fuzz->reduce->dedup->evaluate flow")
+    p.add_argument("workdir", nargs="?", default=None)
+    p.add_argument("-n", type=int, default=20)
+    p.add_argument("--rounds", type=int, default=100)
+    p.add_argument("--seed", type=int, default=None)
+    p.add_argument("-s", "--sensitivity", type=int, default=reducer.DEFAULT_TRACE_SENSITIVITY)
+    p.add_argument("-j", "--jobs", type=int, default=reducer.DEFAULT_REDUCER_JOBS)
+    p.add_argument("--sample", type=int, default=None)
+    p.add_argument("--eval-seed", type=int, default=42)
+    p.add_argument("--timeout", type=float, default=10.0)
+    p.add_argument("--skip-fuzz", action="store_true")
+    p.add_argument("--skip-reduce", action="store_true")
+    p.add_argument("--skip-dedup", action="store_true")
+    p.add_argument("--skip-evaluate", action="store_true")
+    p.set_defaults(func=cmd_pipeline)
+
+    return parser
+
+
 def main():
-    parser = argparse.ArgumentParser()
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    trace_p = subparsers.add_parser("trace")
-    trace_p.add_argument("target")
-    trace_p.add_argument("-s", "--sensitivity", type=int, default=1)
-    trace_p.set_defaults(func=cmd_trace)
-
-    mutate_p = subparsers.add_parser("mutate")
-    mutate_p.add_argument("c_files", nargs="*",)
-    mutate_p.add_argument("--config", metavar="FILE")
-    mutate_p.add_argument("-I", "--include", metavar="DIR", action="append")
-    mutate_p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
-    mutate_p.set_defaults(func=cmd_mutate)
-
-    mutate_cpython_p = subparsers.add_parser("mutate-cpython")
-    mutate_cpython_p.add_argument("file", nargs="?", default=None)
-    mutate_cpython_p.add_argument("--config", metavar="FILE")
-    mutate_cpython_p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
-    mutate_cpython_p.set_defaults(func=cmd_mutate_cpython)
-
-    eval_p = subparsers.add_parser("evaluate")
-    eval_p.add_argument("--sample", type=int, default=None)
-    eval_p.add_argument("--seed", type=int, default=42)
-    eval_p.add_argument("--timeout", type=float, default=10.0)
-    eval_p.add_argument("--tests-dir", type=str, default=None, metavar="DIR")
-    eval_p.add_argument("--binary", type=str, default=None, metavar="PATH")
-    eval_p.add_argument("--meta", type=str, default=None, metavar="PATH")
-    eval_p.set_defaults(func=cmd_evaluate)
-
-    args = parser.parse_args()
-    args.func(args)
+    args = build_parser().parse_args()
+    rc = args.func(args)
+    sys.exit(rc or 0)
 
 
 if __name__ == "__main__":
