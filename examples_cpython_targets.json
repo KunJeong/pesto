@@ -1,4 +1,42 @@
 {
-  "Objects/longobject.c": ["PyLong_FromLong", "PyLong_AsLong", "long_normalize"],
-  "Objects/floatobject.c": ["PyFloat_AsDouble", "float_richcompare"]
+  "Objects/abstract.c": [
+    "PyNumber_Add",
+    "PyNumber_And",
+    "PyNumber_FloorDivide",
+    "PyNumber_Multiply",
+    "PyNumber_Remainder",
+    "PyNumber_Subtract",
+    "PyObject_GetBuffer",
+    "PyObject_GetItem",
+    "PyObject_GetIter",
+    "_PyNumber_Index",
+    "binary_op"
+  ],
+  "Objects/object.c": [
+    "PyObject_RichCompare"
+  ],
+  "Objects/unicodeobject.c": [
+    "PyUnicode_Concat",
+    "unicode_subscript"
+  ],
+  "Python/getargs.c": [
+    "_PyArg_BadArgument"
+  ],
+  "Python/ceval.c": [
+    "_PyEval_EvalFrameDefault"
+  ],
+  "Python/bltinmodule.c": [
+    "builtin_next",
+    "builtin_ord"
+  ],
+  "Objects/bytearrayobject.c": [
+    "bytearray___init__"
+  ],
+  "Objects/complexobject.c": [
+    "complex_new"
+  ],
+  "Objects/listobject.c": [
+    "list_concat",
+    "list_subscript"
+  ]
 }

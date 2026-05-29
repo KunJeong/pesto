@@ -10,12 +10,13 @@ from . import paths
 from .mutator import CPYTHON_DEFINES, CPYTHON_INCLUDE_PATHS, mutate_file
 
 
-def _mutate_targets(root, targets, mutations, meta_path) -> bool:
+def _mutate_targets(root, targets, mutations, meta_path):
     """Mutate each target in place; write unified metadata with global IDs."""
     all_mutations = []
     file_entries = []
     id_offset = 0
     runtime_written = False
+    mutated_targets = {}
 
     for rel_file, func_list in targets.items():
         target = root / rel_file
@@ -33,11 +34,14 @@ def _mutate_targets(root, targets, mutations, meta_path) -> bool:
             msg = str(e).splitlines()[0][:80]
             print(f"Failed [{type(e).__name__}] {msg}")
             return False
-        target.write_text(mutated_code)
-        if not runtime_written:
-            (target.parent / "pesto_runtime.c").write_text(runtime_code)
-            runtime_written = True
         print(f"Done: {mutation_count} mutations in {rel_file}")
+
+        if mutation_count > 0:
+            target.write_text(mutated_code)
+            mutated_targets[rel_file] = func_list
+            if not runtime_written:
+                (target.parent / "pesto_runtime.c").write_text(runtime_code)
+                runtime_written = True
 
         file_entries.append({
             "file": str(target),
@@ -52,7 +56,7 @@ def _mutate_targets(root, targets, mutations, meta_path) -> bool:
         "mutations": all_mutations,
         "files": file_entries,
     }, indent=2))
-    return True
+    return mutated_targets
 
 
 def _patch_makefile(root, targets) -> None:
@@ -79,11 +83,16 @@ def _patch_makefile(root, targets) -> None:
         mutated_obj = f"{t_rel}/{t.stem}.o"
         mutated_src = f"{t_rel}/{t.stem}.c"
         mutated_objs.append(mutated_obj)
-        if f"{mutated_obj}:" not in content:
-            additions += (
-                f"\n{mutated_obj}: {mutated_src}\n"
-                f"\t$(CC) $(filter-out -O%,$(PY_CORE_CFLAGS)) -O0 -c -o $@ $<\n"
-            )
+        pesto_rule = (
+            f"\n{mutated_obj}: {mutated_src}\n"
+            f"\t$(CC) $(filter-out -O% -Werror=implicit-function-declaration -std=%,"
+            f"$(PY_CORE_CFLAGS)) -std=gnu11 -O0 -DUSE_COMPUTED_GOTOS=0"
+            f" -Wno-implicit-function-declaration"
+            f" -Wno-incompatible-pointer-types"
+            f" -Wno-int-conversion -c -o $@ $<\n"
+        )
+        if pesto_rule not in content:
+            additions += pesto_rule
 
     all_objs = " ".join([runtime_obj] + mutated_objs)
     pesto_build_entry = (
@@ -126,10 +135,13 @@ def build_mutated_cpython(file: str = "Objects/longobject.c", mutations=None, ta
     meta_path = paths.LONGOBJECT_META
     if meta_path.exists():
         print("Already mutated, skipping mutation step.")
-    elif not _mutate_targets(root, targets, mutations, meta_path):
-        return False
+        mutated_targets = targets
+    else:
+        mutated_targets = _mutate_targets(root, targets, mutations, meta_path)
+        if mutated_targets is False:
+            return False
 
-    _patch_makefile(root, targets)
+    _patch_makefile(root, mutated_targets)
 
     print("Building mutated CPython ...")
     result = subprocess.run(

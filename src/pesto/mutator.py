@@ -52,6 +52,7 @@ DEFAULT_CPP_ARGS = [
     "-D__inline__=static",
     "-D__volatile__=volatile",
     "-D__builtin_va_list=int",
+    "-D__builtin_va_arg(ap,t)=__pesto_vaarg((ap),(t*)0)",
     "-D__asm__(x)=",
     "-D__asm(x)=",
 ]
@@ -451,13 +452,107 @@ def _collect_scalar_typedefs(tree):
     return scalar
 
 
+_FOOTER_TRIGGERS = (
+    '"stringlib/asciilib', '"stringlib/ucs1lib',
+    '"stringlib/ucs2lib', '"stringlib/ucs4lib',
+)
+_ALWAYS_HEADER = (
+    '"stringlib/localeutil', '"stringlib/eq',
+)
+_NEVER_EXTRACT = (
+    '"generated_cases.c.h"',
+    '"executor_cases.c.h"',
+)
+
+
 def _extract_includes(c_file):
-    lines = []
-    for line in Path(c_file).read_text().splitlines():
+    src_lines = Path(c_file).read_text().splitlines()
+    header, footer = [], []
+    in_template_block = False
+
+    def is_trigger(stripped):
+        return stripped.startswith('#include') and any(
+            pat in stripped for pat in _FOOTER_TRIGGERS
+        )
+
+    def is_always_hdr(stripped):
+        return stripped.startswith('#include') and any(
+            pat in stripped for pat in _ALWAYS_HEADER
+        )
+
+    i = 0
+    while i < len(src_lines):
+        line = src_lines[i]
         stripped = line.strip()
-        if stripped.startswith('#include'):
-            lines.append(line)
-    return '\n'.join(lines) + '\n'
+
+        if stripped.startswith(('#if ', '#ifdef', '#ifndef', '#if\t')):
+            block = []
+            block_depth = 0
+            j = i
+            while j < len(src_lines):
+                bline = src_lines[j]
+                bstripped = bline.strip()
+                if bstripped.startswith(('#if ', '#ifdef', '#ifndef', '#if\t')):
+                    block_depth += 1
+                elif bstripped.startswith('#endif'):
+                    block_depth -= 1
+                block.append(bline)
+                j += 1
+                if block_depth == 0:
+                    break
+
+            has_define = any(
+                bl.strip().startswith(('#define', '#undef')) for bl in block
+            )
+            if has_define:
+                dest = footer if in_template_block else header
+                dest.extend(block)
+            i = j
+            continue
+
+        elif stripped.startswith(('#define', '#undef')):
+            # Multi-line define: gather continuation lines
+            block = [line]
+            while block[-1].rstrip().endswith('\\') and i + len(block) < len(src_lines):
+                block.append(src_lines[i + len(block)])
+            i += len(block)
+            dest = footer if in_template_block else header
+            dest.extend(block)
+            continue
+
+        elif stripped.startswith('#include'):
+            if any(pat in stripped for pat in _NEVER_EXTRACT):
+                pass 
+            elif is_always_hdr(stripped):
+                in_template_block = False
+                header.append(line)
+            elif is_trigger(stripped):
+                in_template_block = True
+                footer.append(line)
+            elif in_template_block:
+                footer.append(line)
+            else:
+                header.append(line)
+
+        i += 1
+
+    return '\n'.join(header) + '\n', '\n'.join(footer) + '\n'
+
+
+_VAARG_RE = re.compile(r'__pesto_vaarg\((.+?),\s*\((.+?)\)\s*0\)')
+
+
+def _restore_va_arg(code):
+    """Turn the __pesto_vaarg(...) markers (see DEFAULT_CPP_ARGS) back into real
+    va_arg() calls.  The marker is ``__pesto_vaarg((ap), (T *) 0)`` where ``T``
+    is the original va_arg type with one extra ``*`` appended; we drop that
+    trailing ``*`` to recover the type."""
+    def repl(m):
+        ap = m.group(1).strip()
+        cast = m.group(2).strip()
+        t = cast[:-1].rstrip() if cast.endswith('*') else cast
+        return f'va_arg({ap}, {t})'
+    return _VAARG_RE.sub(repl, code)
 
 
 def _decl_name(node):
@@ -487,17 +582,17 @@ def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
 
     header_func_defs = {_decl_name(d) for d in other_decls if isinstance(d, c_ast.FuncDef)} - {None}
 
-    _undef_re = re.compile(r'^\s*#undef\s+(\w+)')
-    undef_names = set()
+    _define_re = re.compile(r'^\s*#define\s+(\w+)(?![\w(])')
+    define_names = set()
     for line in Path(c_file).read_text().splitlines():
-        m = _undef_re.match(line)
+        m = _define_re.match(line)
         if m:
-            undef_names.add(m.group(1))
+            define_names.add(m.group(1))
 
     target_decls = [
         d for d in target_decls
         if not (isinstance(d, c_ast.FuncDef) and
-                (_decl_name(d) in header_func_defs or _decl_name(d) in undef_names))
+                (_decl_name(d) in header_func_defs or _decl_name(d) in define_names))
     ]
     tree.ext = target_decls
 
@@ -523,11 +618,96 @@ def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
     visitor.visit(tree)
 
     code = c_generator.CGenerator().visit(tree)
-    includes = _extract_includes(c_file)
+    code = _restore_va_arg(code)
+    header_includes, footer_includes = _extract_includes(c_file)
+
+    gen = c_generator.CGenerator()
+    forward_decls = []
+
+    seen_structs: set = set()
+    for d in target_decls:
+        cands = []
+        if isinstance(d, c_ast.Decl):
+            cands.append(d.type)
+        elif isinstance(d, c_ast.FuncDef) and d.decl:
+            cands.append(d.decl.type)
+        for t in cands:
+            while isinstance(t, (c_ast.PtrDecl, c_ast.TypeDecl)):
+                t = t.type
+            if isinstance(t, c_ast.Struct) and t.name and t.name not in seen_structs:
+                forward_decls.append(f'struct {t.name};')
+                seen_structs.add(t.name)
+
+    local_typedefs = {
+        d.name for d in target_decls
+        if isinstance(d, c_ast.Typedef)
+    }
+    local_structs = seen_structs
+    for d in target_decls:
+        if not isinstance(d, c_ast.FuncDef):
+            continue
+        decl = d.decl
+        if 'static' not in (decl.storage or []):
+            continue
+        try:
+            decl_text = gen.visit(decl) + ';'
+        except Exception:
+            continue
+        if any(t in decl_text for t in local_typedefs | local_structs):
+            continue
+        forward_decls.append(decl_text)
+
+    _TEMPLATE_HDR_PATTERNS = (
+        'asciilib', 'ucs1lib', 'ucs2lib', 'ucs4lib', 'fastsearch',
+        'partition', 'split', 'count', 'find', 'replace', 'codecs',
+        'find_max_char', 'transmogrify',
+    )
+    if footer_includes:
+        for d in other_decls:
+            if not (isinstance(d, c_ast.FuncDef) and d.coord):
+                continue
+            f = str(d.coord.file)
+            if 'stringlib' not in f:
+                continue
+            if not any(pat in f for pat in _TEMPLATE_HDR_PATTERNS):
+                continue
+            func_name = _decl_name(d)
+            if func_name is None:
+                continue
+            try:
+                decl_text = gen.visit(d.decl) + ';'
+            except Exception:
+                continue
+            if 'prework' in decl_text:
+                continue
+            forward_decls.append(decl_text)
+
     diag = (
         '#pragma GCC diagnostic ignored "-Wunused-variable"\n'
         '#pragma GCC diagnostic ignored "-Wunused-function"\n'
         '#pragma GCC diagnostic ignored "-Wmissing-field-initializers"\n'
     )
+    fwd_section = '\n'.join(forward_decls) + '\n' if forward_decls else ''
+
+    header_lines = header_includes.splitlines(keepends=True)
+    early_includes, late_includes = [], []
+    seen_late = False
+    for hl in header_lines:
+        s = hl.strip()
+        if s.startswith('#include') and not (
+            '"Python.h"' in s or '<Python.h>' in s
+            or '"pycore_' in s or '"cpython/' in s
+            or '<std' in s or '<errno' in s or '<assert' in s
+            or '<wchar' in s or '<limits' in s or '<ctype' in s
+            or '"bytesobject.h"' in s or '"tupleobject.h"' in s
+        ):
+            seen_late = True
+        (late_includes if seen_late else early_includes).append(hl)
+    early_hdr = ''.join(early_includes)
+    late_hdr = ''.join(late_includes)
+
     mutation_count = visitor._counter - id_offset
-    return PREAMBLE + includes + diag + code, RUNTIME_C, mutation_count, visitor._mutations
+    return (
+        PREAMBLE + early_hdr + fwd_section + late_hdr + diag + code + footer_includes,
+        RUNTIME_C, mutation_count, visitor._mutations,
+    )

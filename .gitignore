@@ -6,3 +6,5 @@ __pycache__/
 vendor/
 pesto_mutation/
 mutant
+case_*.py
+case_*.err
