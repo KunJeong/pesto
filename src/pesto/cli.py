@@ -65,7 +65,7 @@ def cmd_dedup(args):
 
 
 def cmd_summarize(args):
-    return summarize.summarize_errors(args.input_dir)
+    return summarize.summarize_errors(args.input_dir, out_dir=args.out_dir)
 
 
 def _load_config(config_path):
@@ -204,6 +204,11 @@ def build_parser():
 
     p = sub.add_parser("summarize", help="summarize exceptions from fuzzer .err logs")
     p.add_argument("input_dir")
+    p.add_argument(
+        "-o",
+        "--out-dir",
+        help="copy .py files whose .err final exception class is TypeError",
+    )
     p.set_defaults(func=cmd_summarize)
 
     p = sub.add_parser("mutate", help="mutate plain C files and emit a compile recipe")

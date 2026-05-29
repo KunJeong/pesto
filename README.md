@@ -27,7 +27,8 @@ fuzz-proc                      # compile the fuzzing grammar (run once / after e
 fuzz -n N [--rounds R] [--seed S] [-o DIR]
 reduce -o DIR [-i FILE | --input-dir DIR] [-s N] [-j JOBS]
 dedup INPUT_DIR OUTPUT_DIR     # keep one program per unique AST
-summarize INPUT_DIR            # exception statistics from fuzzer .err logs
+summarize INPUT_DIR [-o OUTPUT_DIR]
+                               # exception stats; optionally copy TypeError .py files
 mutate (FILE.c ... | --config JSON) [-I DIR] [-m N ...]
 mutate-cpython ([FILE] | --config JSON) [-m N ...]
 evaluate [--sample N] [--seed N] [--timeout S] [--tests-dir DIR]
@@ -78,3 +79,55 @@ python src/pesto/cli.py pipeline --skip-fuzz --skip-reduce --skip-dedup
 - `scripts/` — one-time environment setup (patched CPython, Perses)
 - `samples/test.c` — sample C file exercising every mutation operator
 - `tests/` — sample crashing programs and fuzzer output
+
+# Steps to extract function lists
+
+This workflow starts from a fuzzer results directory containing `.err` files.
+
+1. Filter TypeError programs:
+
+```bash
+python src/pesto/cli.py summarize [ERR_RESULTS_DIR] -o [TYPEERRORS_DIR]
+```
+
+Expected output includes `err_files`, the exception distribution, and
+`copied_TypeError`. The output directory receives the matching `.py` files.
+
+2. Capture CPython logs for those programs:
+
+```bash
+python src/pesto/scripts/capture_python_logs.py -i [TYPEERRORS_DIR] -o [LOGS_DIR]
+```
+
+This runs `./vendor/cpython/python.exe <case.py> > <case.txt> 2>&1` for each
+input file. Expected output includes `py_files`, `logs_written`, and
+`nonzero_exits`; nonzero exits are expected because these programs crash.
+
+3. Build the function list:
+
+```bash
+python src/pesto/scripts/build_functions_list.py -i [LOGS_DIR] -o [OUTPUT_DIR]
+```
+
+This writes `[OUTPUT_DIR]/functions.list`. Each line contains a function from
+the selected TypeError call trace and its CPython-relative source path, for
+example:
+
+```text
+PyNumber_Add Objects/abstract.c
+```
+
+The extractor uses the first `[PESTO-BEGIN type=TypeError]` block after line
+4365, takes call trace index `2`, deduplicates function names, and writes
+unresolved locations as `TODO`.
+
+Example with the current inspection data:
+
+```bash
+python src/pesto/cli.py summarize tests/fuzzing_samples/results -o tests/typeerrors
+python src/pesto/scripts/capture_python_logs.py -i tests/typeerrors -o tests/typeerrors-logs
+python src/pesto/scripts/build_functions_list.py -i tests/typeerrors-logs -o .
+```
+
+For the current 500-case inspection set, expect 285 copied TypeError programs
+and 22 unique functions.
