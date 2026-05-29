@@ -1,0 +1,4 @@
+{
+  "Objects/longobject.c": ["PyLong_FromLong", "PyLong_AsLong", "long_normalize"],
+  "Objects/floatobject.c": ["PyFloat_AsDouble", "float_richcompare"]
+}

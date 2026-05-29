@@ -170,8 +170,9 @@ class ConstantCollector(c_ast.NodeVisitor):
 
 class MutationVisitor(c_ast.NodeVisitor):
     def __init__(self, scalar_typedefs=None, enabled=None,
-                 global_consts=(), func_consts=None):
-        self._counter = 0
+                 global_consts=(), func_consts=None,
+                 target_functions=None, id_offset=0):
+        self._counter = id_offset
         self._mutations = []
         self._scopes = [{}]
         self._suppress_scalar = False
@@ -180,6 +181,7 @@ class MutationVisitor(c_ast.NodeVisitor):
         self._global_consts = list(global_consts)
         self._func_consts = func_consts or {}
         self._current_func_name = None
+        self._target_functions = target_functions  # None means all functions
 
     def _next_id(self, mutation_type, **info):
         n = self._counter
@@ -420,7 +422,10 @@ class MutationVisitor(c_ast.NodeVisitor):
         return result
 
     def visit_FuncDef(self, node):
-        self._current_func_name = node.decl.name
+        func_name = node.decl.name
+        if self._target_functions is not None and func_name not in self._target_functions:
+            return node
+        self._current_func_name = func_name
         self._scopes.append({})
         self.generic_visit(node)
         self._scopes.pop()
@@ -464,17 +469,18 @@ def _decl_name(node):
 
 
 def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
-                enabled_mutations=None):
+                enabled_mutations=None, target_functions=None, id_offset=0):
     args = list(DEFAULT_CPP_ARGS)
     if include_paths:
         args.extend(f"-I{p}" for p in include_paths)
     if cpp_args:
         args.extend(cpp_args)
 
+    c_file = str(Path(c_file).resolve())
     tree = pycparser.parse_file(c_file, use_cpp=True, cpp_path=cpp_path, cpp_args=args)
 
     scalar_typedefs = _collect_scalar_typedefs(tree)
-    target_path = str(Path(c_file).resolve())
+    target_path = c_file
 
     other_decls  = [d for d in tree.ext if not (d.coord and str(d.coord.file) == target_path)]
     target_decls = [d for d in tree.ext if      d.coord and str(d.coord.file) == target_path]
@@ -504,11 +510,15 @@ def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
         global_consts = collector.global_set()
         func_consts = collector.all_func_sets()
 
+    target_func_set = set(target_functions) if target_functions is not None else None
+
     visitor = MutationVisitor(
         scalar_typedefs=scalar_typedefs,
         enabled=enabled,
         global_consts=global_consts,
         func_consts=func_consts,
+        target_functions=target_func_set,
+        id_offset=id_offset,
     )
     visitor.visit(tree)
 
@@ -519,4 +529,5 @@ def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
         '#pragma GCC diagnostic ignored "-Wunused-function"\n'
         '#pragma GCC diagnostic ignored "-Wmissing-field-initializers"\n'
     )
-    return PREAMBLE + includes + diag + code, RUNTIME_C, visitor._counter, visitor._mutations
+    mutation_count = visitor._counter - id_offset
+    return PREAMBLE + includes + diag + code, RUNTIME_C, mutation_count, visitor._mutations

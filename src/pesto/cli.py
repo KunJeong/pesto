@@ -67,22 +67,46 @@ def _parse_mutations(numbers):
     return result
 
 
+def _load_config(config_path):
+    with open(config_path) as f:
+        raw = json.load(f)
+    if not isinstance(raw, dict):
+        raise SystemExit(f"Config must be a JSON object mapping file paths to function lists.")
+    return raw 
+
+
 def cmd_mutate(args: argparse.Namespace):
     from mutator import mutate_file
 
+    if args.config and args.c_files:
+        raise SystemExit("error: --config and positional c_files are mutually exclusive")
+    if not args.config and not args.c_files:
+        raise SystemExit("error: provide either c_files or --config")
+
     enabled = _parse_mutations(args.mutations) if args.mutations else None
+
+    if args.config:
+        targets = _load_config(args.config)
+    else:
+        targets = {f: None for f in args.c_files}
 
     out_dir = Path.cwd() / "pesto_mutation"
     out_dir.mkdir(exist_ok=True)
 
     runtime_written = False
     mutated_paths = []
+    all_mutations = []
+    file_entries = []
+    id_offset = 0
 
-    for c_file in args.c_files:
+    for c_file, func_list in targets.items():
+        target_functions = func_list if func_list is not None else None
         mutated_code, runtime_code, mutation_count, mutations = mutate_file(
             c_file,
             include_paths=args.include or [],
             enabled_mutations=enabled,
+            target_functions=target_functions,
+            id_offset=id_offset,
         )
         stem = Path(c_file).stem
         mutated_path = out_dir / f"{stem}.c"
@@ -95,6 +119,21 @@ def cmd_mutate(args: argparse.Namespace):
         if not runtime_written:
             (out_dir / "pesto_runtime.c").write_text(runtime_code)
             runtime_written = True
+
+        file_entries.append({
+            "file": c_file,
+            "mutation_count": mutation_count,
+            "id_range": [id_offset, id_offset + mutation_count - 1] if mutation_count else [],
+        })
+        all_mutations.extend(mutations)
+        id_offset += mutation_count
+
+    unified_meta = {
+        "mutation_count": id_offset,
+        "mutations": all_mutations,
+        "files": file_entries,
+    }
+    (out_dir / "pesto.json").write_text(json.dumps(unified_meta, indent=2))
 
     print(f"Compile: gcc {' '.join(str(p) for p in mutated_paths)} {out_dir}/pesto_runtime.c -o mutant")
     print("Run:     PESTO_MUTANT_ID=<id> ./mutant  (-1 = original)")
@@ -119,35 +158,66 @@ def cmd_mutate_cpython(args: argparse.Namespace):
     enabled = _parse_mutations(args.mutations) if args.mutations else None
 
     meta_path = PATCHED_CPYTHON_ROOT / "pesto.json"
-    target = PATCHED_CPYTHON_ROOT / args.file
+
+    if args.config and args.file:
+        raise SystemExit("error: --config and positional file are mutually exclusive")
+
+    if args.config:
+        raw_targets = _load_config(args.config)
+        targets = {rel: (funcs if funcs is not None else None) for rel, funcs in raw_targets.items()}
+    else:
+        targets = {(args.file or "Objects/longobject.c"): None}
 
     if meta_path.exists():
         print("Already mutated, skipping mutation step.")
     else:
-        print(f"Mutating {args.file} ...")
-        try:
-            mutated_code, runtime_code, mutation_count, mutations = mutate_file(
-                str(target),
-                cpp_args=CPYTHON_DEFINES,
-                include_paths=include_paths,
-                enabled_mutations=enabled,
-            )
-            target.write_text(mutated_code)
-            (target.parent / "pesto_runtime.c").write_text(runtime_code)
+        all_mutations = []
+        file_entries = []
+        id_offset = 0
+        runtime_written = False
 
-            meta = {"file": str(target), "mutation_count": mutation_count, "mutations": mutations}
-            meta_path.write_text(json.dumps(meta, indent=2))
-            print(f"Done: {mutation_count} mutations in {args.file}")
-        except Exception as e:
-            msg = str(e).splitlines()[0][:80]
-            print(f"Failed [{type(e).__name__}] {msg}")
-            return
+        for rel_file, func_list in targets.items():
+            target = PATCHED_CPYTHON_ROOT / rel_file
+            print(f"Mutating {rel_file} ...")
+            try:
+                mutated_code, runtime_code, mutation_count, mutations = mutate_file(
+                    str(target),
+                    cpp_args=CPYTHON_DEFINES,
+                    include_paths=include_paths,
+                    enabled_mutations=enabled,
+                    target_functions=func_list,
+                    id_offset=id_offset,
+                )
+                target.write_text(mutated_code)
+                if not runtime_written:
+                    (target.parent / "pesto_runtime.c").write_text(runtime_code)
+                    runtime_written = True
+                print(f"Done: {mutation_count} mutations in {rel_file}")
+            except Exception as e:
+                msg = str(e).splitlines()[0][:80]
+                print(f"Failed [{type(e).__name__}] {msg}")
+                return
 
-    rel = target.parent.relative_to(PATCHED_CPYTHON_ROOT)
-    runtime_obj = f"{rel}/pesto_runtime.o"
-    runtime_src = f"{rel}/pesto_runtime.c"
-    mutated_obj = f"{rel}/{target.stem}.o"
-    mutated_src = f"{rel}/{target.stem}.c"
+            file_entries.append({
+                "file": str(PATCHED_CPYTHON_ROOT / rel_file),
+                "mutation_count": mutation_count,
+                "id_range": [id_offset, id_offset + mutation_count - 1] if mutation_count else [],
+            })
+            all_mutations.extend(mutations)
+            id_offset += mutation_count
+
+        unified_meta = {
+            "mutation_count": id_offset,
+            "mutations": all_mutations,
+            "files": file_entries,
+        }
+        meta_path.write_text(json.dumps(unified_meta, indent=2))
+
+    first_rel = next(iter(targets))
+    first_target = PATCHED_CPYTHON_ROOT / first_rel
+    runtime_rel = first_target.parent.relative_to(PATCHED_CPYTHON_ROOT)
+    runtime_obj = f"{runtime_rel}/pesto_runtime.o"
+    runtime_src = f"{runtime_rel}/pesto_runtime.c"
 
     makefile = PATCHED_CPYTHON_ROOT / "Makefile"
     content = makefile.read_text()
@@ -159,15 +229,25 @@ def cmd_mutate_cpython(args: argparse.Namespace):
             f"{runtime_obj}: {runtime_src}\n"
             f"\t$(CC) -c -O2 -o $@ $<\n"
         )
-    if f"{mutated_obj}:" not in content:
-        additions += (
-            f"\n{mutated_obj}: {mutated_src}\n"
-            f"\t$(CC) $(filter-out -O%,$(PY_CORE_CFLAGS)) -O0 -c -o $@ $<\n"
-        )
+
+    mutated_objs = []
+    for rel_file in targets:
+        t = PATCHED_CPYTHON_ROOT / rel_file
+        t_rel = t.parent.relative_to(PATCHED_CPYTHON_ROOT)
+        mutated_obj = f"{t_rel}/{t.stem}.o"
+        mutated_src = f"{t_rel}/{t.stem}.c"
+        mutated_objs.append(mutated_obj)
+        if f"{mutated_obj}:" not in content:
+            additions += (
+                f"\n{mutated_obj}: {mutated_src}\n"
+                f"\t$(CC) $(filter-out -O%,$(PY_CORE_CFLAGS)) -O0 -c -o $@ $<\n"
+            )
+
+    all_objs = " ".join([runtime_obj] + mutated_objs)
     pesto_build_entry = (
         f"\n.PHONY: pesto-build\n"
-        f"pesto-build: {runtime_obj} {mutated_obj}\n"
-        f"\t$(AR) r $(BLDLIBRARY) {runtime_obj} {mutated_obj}\n"
+        f"pesto-build: {all_objs}\n"
+        f"\t$(AR) r $(BLDLIBRARY) {all_objs}\n"
         f"\t$(LINKCC) $(PY_CORE_LDFLAGS) $(LINKFORSHARED) -o $(BUILDPYTHON)"
         f" Programs/python.o $(LINK_PYTHON_OBJS) $(LIBS) $(MODLIBS) $(SYSLIBS)\n"
     )
@@ -219,13 +299,15 @@ def main():
     trace_p.set_defaults(func=cmd_trace)
 
     mutate_p = subparsers.add_parser("mutate")
-    mutate_p.add_argument("c_files", nargs='+')
+    mutate_p.add_argument("c_files", nargs="*",)
+    mutate_p.add_argument("--config", metavar="FILE")
     mutate_p.add_argument("-I", "--include", metavar="DIR", action="append")
     mutate_p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
     mutate_p.set_defaults(func=cmd_mutate)
 
     mutate_cpython_p = subparsers.add_parser("mutate-cpython")
-    mutate_cpython_p.add_argument("file", nargs="?", default="Objects/longobject.c")
+    mutate_cpython_p.add_argument("file", nargs="?", default=None)
+    mutate_cpython_p.add_argument("--config", metavar="FILE")
     mutate_cpython_p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
     mutate_cpython_p.set_defaults(func=cmd_mutate_cpython)
 
