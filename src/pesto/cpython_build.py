@@ -10,7 +10,7 @@ from . import paths
 from .mutator import CPYTHON_DEFINES, CPYTHON_INCLUDE_PATHS, mutate_file
 
 
-def _mutate_targets(root, targets, mutations, meta_path):
+def _mutate_targets(root, targets, mutations, meta_path, smtc_limit=None):
     """Mutate each target in place; write unified metadata with global IDs."""
     all_mutations = []
     file_entries = []
@@ -29,6 +29,7 @@ def _mutate_targets(root, targets, mutations, meta_path):
                 enabled_mutations=mutations,
                 target_functions=func_list,
                 id_offset=id_offset,
+                smtc_limit=smtc_limit,
             )
         except Exception as e:
             msg = str(e).splitlines()[0][:80]
@@ -116,7 +117,7 @@ def _patch_makefile(root, targets) -> None:
         print("Patched Makefile.")
 
 
-def build_mutated_cpython(file: str = "Objects/longobject.c", mutations=None, targets=None) -> bool:
+def build_mutated_cpython(file: str = "Objects/longobject.c", mutations=None, targets=None, smtc_limit=None) -> bool:
     """Mutate CPython source file(s) and rebuild patched CPython.
 
     ``targets`` maps repo-relative paths to function lists (None = all functions
@@ -137,7 +138,7 @@ def build_mutated_cpython(file: str = "Objects/longobject.c", mutations=None, ta
         print("Already mutated, skipping mutation step.")
         mutated_targets = targets
     else:
-        mutated_targets = _mutate_targets(root, targets, mutations, meta_path)
+        mutated_targets = _mutate_targets(root, targets, mutations, meta_path, smtc_limit)
         if mutated_targets is False:
             return False
 

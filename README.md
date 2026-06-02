@@ -29,13 +29,17 @@ reduce -o DIR [-i FILE | --input-dir DIR] [-s N] [-j JOBS]
 dedup INPUT_DIR OUTPUT_DIR     # keep one program per unique AST
 summarize INPUT_DIR [-o OUTPUT_DIR]
                                # exception stats; optionally copy TypeError .py files
-mutate (FILE.c ... | --config JSON) [-I DIR] [-m N ...]
-mutate-cpython ([FILE] | --config JSON) [-m N ...]
+mutate (FILE.c ... | --config JSON) [-I DIR] [-m N ...] [--smtc-limit N]
+mutate-cpython ([FILE] | --config JSON) [-m N ...] [--smtc-limit N]
 evaluate [--sample N] [--seed N] [--timeout S] [--tests-dir DIR]
 ```
 
 Mutation operators for `-m` (default `1 2 3 7`):
-`1=ORRN 2=VTWD 3=VDTR 4=OASN 5=OLBN 6=SWDD 7=SSDL 8=Ccrc 9=Ccrs`.
+`1=ORRN 2=VTWD 3=VDTR 4=OASN 5=OLBN 6=SWDD 7=SSDL 8=Ccrc 9=Ccrs 10=SMTC`.
+
+`SMTC` instruments every `for`/`while`/`do-while` loop so the mutant `abort()`s
+once the loop body has executed N times; pick N with `--smtc-limit N` (default
+`1`). It exposes bugs that only surface after a loop has iterated enough times.
 
 ### Targeted multi-file mutation
 

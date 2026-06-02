@@ -66,6 +66,7 @@ extern int    __pesto_trap_zero_int(int    x);
 extern double __pesto_trap_neg_dbl (double x);
 extern double __pesto_trap_pos_dbl (double x);
 extern double __pesto_trap_zero_dbl(double x);
+extern void   __pesto_smtc(int limit);
 
 #define __pesto_trap_neg(x)  _Generic((x), double: __pesto_trap_neg_dbl,  default: __pesto_trap_neg_int )(x)
 #define __pesto_trap_pos(x)  _Generic((x), double: __pesto_trap_pos_dbl,  default: __pesto_trap_pos_int )(x)
@@ -93,9 +94,14 @@ int    __pesto_trap_zero_int(int    x) { if (x == 0)   abort(); return x; }
 double __pesto_trap_neg_dbl (double x) { if (x <  0.0) abort(); return x; }
 double __pesto_trap_pos_dbl (double x) { if (x >  0.0) abort(); return x; }
 double __pesto_trap_zero_dbl(double x) { if (x == 0.0) abort(); return x; }
+
+void __pesto_smtc(int limit) {
+    static int count = 0;
+    if (++count > limit) abort();
+}
 """
 
-ALL_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "OASN", "OLBN", "SWDD", "SSDL", "Ccrc", "Ccrs"]
+ALL_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "OASN", "OLBN", "SWDD", "SSDL", "Ccrc", "Ccrs", "SMTC"]
 DEFAULT_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "SSDL"]
 
 _ORRN_OPS = frozenset({"<", "<=", ">", ">=", "==", "!="})
@@ -184,7 +190,7 @@ class ConstantCollector(c_ast.NodeVisitor):
 class MutationVisitor(c_ast.NodeVisitor):
     def __init__(self, scalar_typedefs=None, enabled=None,
                  global_consts=(), func_consts=None,
-                 target_functions=None, id_offset=0):
+                 target_functions=None, id_offset=0, smtc_limit=None):
         self._counter = id_offset
         self._mutations = []
         self._scopes = [{}]
@@ -196,6 +202,7 @@ class MutationVisitor(c_ast.NodeVisitor):
         self._func_consts = func_consts or {}
         self._current_func_name = None
         self._target_functions = target_functions  # None means all functions
+        self._smtc_limit = smtc_limit if smtc_limit is not None else 1
 
     def _next_id(self, mutation_type, **info):
         n = self._counter
@@ -259,19 +266,50 @@ class MutationVisitor(c_ast.NodeVisitor):
                 )
         return result
 
-    # SWDD
+    # SMTC
+    def _inject_loop_abort(self, node):
+        if "SMTC" not in self._enabled or self._suppress_all:
+            return
+        mid = self._next_id("SMTC", limit=self._smtc_limit)
+        guard = c_ast.If(
+            cond=_id_check(mid),
+            iftrue=c_ast.FuncCall(
+                name=c_ast.ID(name="__pesto_smtc"),
+                args=c_ast.ExprList(exprs=[
+                    c_ast.Constant(type="int", value=str(self._smtc_limit)),
+                ]),
+            ),
+            iffalse=None,
+        )
+        body = node.stmt
+        if isinstance(body, c_ast.Compound):
+            body.block_items = [guard] + (body.block_items or [])
+        else:
+            body_items = [guard] + ([body] if body is not None else [])
+            node.stmt = c_ast.Compound(block_items=body_items)
+
+    # SWDD + SMTC
     def visit_While(self, node):
         self.generic_visit(node)
+        self._inject_loop_abort(node)
         if "SWDD" not in self._enabled:
             return node
         mid = self._next_id("SWDD")
         do_while = c_ast.DoWhile(cond=deepcopy(node.cond), stmt=deepcopy(node.stmt))
         return c_ast.If(cond=_id_check(mid), iftrue=do_while, iffalse=node)
 
+    # SMTC
     def visit_For(self, node):
         self._scopes.append({})
         self.generic_visit(node)
+        self._inject_loop_abort(node)
         self._scopes.pop()
+        return node
+
+    # SMTC
+    def visit_DoWhile(self, node):
+        self.generic_visit(node)
+        self._inject_loop_abort(node)
         return node
 
     def visit_FuncDecl(self, node):
@@ -666,7 +704,8 @@ def _decl_name(node):
 
 
 def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
-                enabled_mutations=None, target_functions=None, id_offset=0):
+                enabled_mutations=None, target_functions=None, id_offset=0,
+                smtc_limit=None):
     args = list(DEFAULT_CPP_ARGS)
     if include_paths:
         args.extend(f"-I{p}" for p in include_paths)
@@ -716,6 +755,7 @@ def mutate_file(c_file, cpp_path="gcc", cpp_args=None, include_paths=None,
         func_consts=func_consts,
         target_functions=target_func_set,
         id_offset=id_offset,
+        smtc_limit=smtc_limit,
     )
     visitor.visit(tree)
 

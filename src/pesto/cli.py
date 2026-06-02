@@ -34,6 +34,11 @@ def _parse_mutations(numbers):
     return result
 
 
+def _validate_smtc_limit(value):
+    if value is not None and value < 0:
+        raise SystemExit(f"--smtc-limit must be >= 0 (got {value})")
+
+
 def cmd_trace(args):
     print(tracer.trace_summary(args.target, args.sensitivity))
 
@@ -83,6 +88,7 @@ def cmd_mutate(args):
         raise SystemExit("error: provide either c_files or --config")
 
     enabled = _parse_mutations(args.mutations) if args.mutations else None
+    _validate_smtc_limit(args.smtc_limit)
     targets = _load_config(args.config) if args.config else {f: None for f in args.c_files}
 
     out_dir = Path.cwd() / "pesto_mutation"
@@ -101,6 +107,7 @@ def cmd_mutate(args):
             enabled_mutations=enabled,
             target_functions=func_list,
             id_offset=id_offset,
+            smtc_limit=args.smtc_limit,
         )
         stem = Path(c_file).stem
         mutated_path = out_dir / f"{stem}.c"
@@ -134,9 +141,11 @@ def cmd_mutate_cpython(args):
         raise SystemExit("error: --config and positional file are mutually exclusive")
 
     enabled = _parse_mutations(args.mutations) if args.mutations else None
+    _validate_smtc_limit(args.smtc_limit)
     targets = _load_config(args.config) if args.config else None
     built = cpython_build.build_mutated_cpython(
-        file=args.file or "Objects/longobject.c", mutations=enabled, targets=targets
+        file=args.file or "Objects/longobject.c", mutations=enabled, targets=targets,
+        smtc_limit=args.smtc_limit,
     )
     return 0 if built else 1
 
@@ -216,12 +225,14 @@ def build_parser():
     p.add_argument("--config", metavar="JSON", help="JSON map of file -> function list (null = all)")
     p.add_argument("-I", "--include", metavar="DIR", action="append")
     p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
+    p.add_argument("--smtc-limit", type=int, metavar="N")
     p.set_defaults(func=cmd_mutate)
 
     p = sub.add_parser("mutate-cpython", help="mutate CPython source file(s) and rebuild")
     p.add_argument("file", nargs="?", default=None)
     p.add_argument("--config", metavar="JSON", help="JSON map of cpython-relative file -> function list (null = all)")
     p.add_argument("-m", "--mutations", nargs="+", type=int, metavar="N")
+    p.add_argument("--smtc-limit", type=int, metavar="N")
     p.set_defaults(func=cmd_mutate_cpython)
 
     p = sub.add_parser("evaluate", help="compute the mutation score of a test suite")

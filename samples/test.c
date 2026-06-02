@@ -27,13 +27,32 @@ int logical(int a, int b) {
     return 0;
 }
 
-/* SWDD */
+/* SWDD + SMTC (while) */
 int sum_while(int n) {
     int s = 0;
     while (n > 0) {
         s = s + n;
         n = n - 1;
     }
+    return s;
+}
+
+/* SMTC (for) */
+int sum_for(int n) {
+    int s = 0;
+    for (int i = 0; i < n; i++) {
+        s = s + i;
+    }
+    return s;
+}
+
+/* SMTC (do-while) */
+int sum_do(int n) {
+    int s = 0;
+    do {
+        s = s + n;
+        n = n - 1;
+    } while (n > 0);
     return s;
 }
 
