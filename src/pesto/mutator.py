@@ -114,15 +114,27 @@ _OASN_MUTATIONS = {op: ["<<", ">>"] for op in _OASN_OPS}
 _OLBN_OPS = frozenset({"&&", "||"})
 _OLBN_MUTATIONS = {"&&": ["&"], "||": ["|"]}
 
-_PRIMITIVE_INT_TYPES = frozenset({
+_INTEGER_PRIM_TYPES = frozenset({
     'int', 'long', 'short', 'char', 'unsigned', 'signed',
-    'float', 'double',
 })
+_FLOAT_PRIM_TYPES = frozenset({'float', 'double'})
 
 _NUMERIC_CONST_TYPES = frozenset({
     'int', 'unsigned int', 'long', 'unsigned long',
     'long long', 'unsigned long long', 'float', 'double', 'long double',
 })
+
+_INTEGER_CONST_TYPES = frozenset({
+    'int', 'unsigned int', 'long int', 'unsigned long int',
+    'long long int', 'unsigned long long int', 'char',
+})
+
+_INT_RESULT_BINOPS = frozenset({
+    '+', '-', '*', '/', '%', '&', '|', '^', '<<', '>>',
+})
+_BOOL_RESULT_BINOPS = frozenset({'<', '<=', '>', '>=', '==', '!=', '&&', '||'})
+
+_MAX_CONST_REPLACEMENTS = 3
 
 _CHILD_LIST_RE = re.compile(r"^(\w+)\[(\d+)\]$")
 
@@ -177,7 +189,8 @@ class MutationVisitor(c_ast.NodeVisitor):
         self._mutations = []
         self._scopes = [{}]
         self._suppress_scalar = False
-        self._scalar_typedefs = scalar_typedefs if scalar_typedefs is not None else set()
+        self._suppress_all = False
+        self._scalar_typedefs = dict(scalar_typedefs) if scalar_typedefs is not None else {}
         self._enabled = set(enabled) if enabled is not None else set(DEFAULT_MUTATION_TYPES)
         self._global_consts = list(global_consts)
         self._func_consts = func_consts or {}
@@ -201,19 +214,24 @@ class MutationVisitor(c_ast.NodeVisitor):
                     setattr(node, attr, new_child)
         return node
 
-    def _is_scalar_type(self, type_node):
-        if isinstance(type_node, c_ast.TypeDecl):
-            if isinstance(type_node.type, c_ast.IdentifierType):
-                names = set(type_node.type.names)
-                if names & _PRIMITIVE_INT_TYPES:
-                    return True
-                if names <= self._scalar_typedefs:
-                    return True
-        return False
+    def _kind_of_type(self, type_node):
+        if isinstance(type_node, c_ast.TypeDecl) and isinstance(type_node.type, c_ast.IdentifierType):
+            names = set(type_node.type.names)
+            if names & _FLOAT_PRIM_TYPES:
+                return 'float'
+            if names & _INTEGER_PRIM_TYPES:
+                return 'int'
+            if names <= self._scalar_typedefs.keys():
+                kinds = {self._scalar_typedefs[n] for n in names}
+                return 'float' if 'float' in kinds else 'int'
+        return 'other'
 
     # ORRN, OASN, OLBN
     def visit_BinaryOp(self, node):
+        operands_integer = self._is_integer_expr(node.left) and self._is_integer_expr(node.right)
         self.generic_visit(node)
+        if self._suppress_all:
+            return node
         result = node
         if node.op in _ORRN_OPS and "ORRN" in self._enabled:
             for alt_op in _ORRN_MUTATIONS[node.op]:
@@ -223,7 +241,7 @@ class MutationVisitor(c_ast.NodeVisitor):
                     iftrue=c_ast.BinaryOp(op=alt_op, left=deepcopy(node.left), right=deepcopy(node.right)),
                     iffalse=result,
                 )
-        if node.op in _OASN_OPS and "OASN" in self._enabled:
+        if node.op in _OASN_OPS and "OASN" in self._enabled and operands_integer:
             for alt_op in _OASN_MUTATIONS[node.op]:
                 mid = self._next_id("OASN", op=node.op, alt=alt_op)
                 result = c_ast.TernaryOp(
@@ -231,7 +249,7 @@ class MutationVisitor(c_ast.NodeVisitor):
                     iftrue=c_ast.BinaryOp(op=alt_op, left=deepcopy(node.left), right=deepcopy(node.right)),
                     iffalse=result,
                 )
-        if node.op in _OLBN_OPS and "OLBN" in self._enabled:
+        if node.op in _OLBN_OPS and "OLBN" in self._enabled and operands_integer:
             for alt_op in _OLBN_MUTATIONS[node.op]:
                 mid = self._next_id("OLBN", op=node.op, alt=alt_op)
                 result = c_ast.TernaryOp(
@@ -249,6 +267,21 @@ class MutationVisitor(c_ast.NodeVisitor):
         mid = self._next_id("SWDD")
         do_while = c_ast.DoWhile(cond=deepcopy(node.cond), stmt=deepcopy(node.stmt))
         return c_ast.If(cond=_id_check(mid), iftrue=do_while, iffalse=node)
+
+    def visit_For(self, node):
+        self._scopes.append({})
+        self.generic_visit(node)
+        self._scopes.pop()
+        return node
+
+    def visit_FuncDecl(self, node):
+        return node
+
+    def visit_ArrayDecl(self, node):
+        old, self._suppress_all = self._suppress_all, True
+        self.generic_visit(node)
+        self._suppress_all = old
+        return node
 
     # SSDL + scope management
     def visit_Compound(self, node):
@@ -270,10 +303,40 @@ class MutationVisitor(c_ast.NodeVisitor):
         self._scopes.pop()
         return node
 
-    def _is_scalar(self, name):
+    def _kind_of_name(self, name):
         for scope in reversed(self._scopes):
             if name in scope:
                 return scope[name]
+        return None
+
+    def _is_scalar(self, name):
+        return self._kind_of_name(name) in ('int', 'float')
+
+    def _is_integer(self, name):
+        return self._kind_of_name(name) == 'int'
+
+    def _is_integer_expr(self, node):
+        if isinstance(node, c_ast.Constant):
+            return node.type in _INTEGER_CONST_TYPES
+        if isinstance(node, c_ast.ID):
+            return self._is_integer(node.name)
+        if isinstance(node, c_ast.Cast):
+            return self._kind_of_type(getattr(node.to_type, 'type', None)) == 'int'
+        if isinstance(node, c_ast.UnaryOp):
+            if node.op in ('~', '!', 'sizeof'):
+                return True
+            if node.op in ('-', '+'):
+                return self._is_integer_expr(node.expr)
+            return False
+        if isinstance(node, c_ast.BinaryOp):
+            if node.op in _BOOL_RESULT_BINOPS:
+                return True
+            if node.op in _INT_RESULT_BINOPS:
+                return self._is_integer_expr(node.left) and self._is_integer_expr(node.right)
+            return False
+        if isinstance(node, c_ast.TernaryOp):
+            return (self._is_integer_expr(node.iftrue)
+                    and self._is_integer_expr(node.iffalse))
         return False
 
     def _visit_suppressed(self, node):
@@ -315,26 +378,32 @@ class MutationVisitor(c_ast.NodeVisitor):
         return result
 
     # Ccrc
-    def _cccr(self, node, key):
+    def _cccr(self, node, key, int_only):
         local = self._func_consts.get(self._current_func_name, [])
         local_set = set(local)
+
+        def usable(t):
+            return (t in _INTEGER_CONST_TYPES) if int_only else True
+
         alts = (
-            [c_ast.Constant(type=t, value=v) for t, v in local if (t, v) != key]
+            [c_ast.Constant(type=t, value=v) for t, v in local
+             if (t, v) != key and usable(t)]
             + [c_ast.Constant(type=t, value=v) for t, v in self._global_consts
-               if (t, v) != key and (t, v) not in local_set]
+               if (t, v) != key and (t, v) not in local_set and usable(t)]
         )
-        return self._ternary_chain(node, alts, "Ccrc")
+        return self._ternary_chain(node, alts[:_MAX_CONST_REPLACEMENTS], "Ccrc")
 
     # Ccrs
-    def _ccsr(self, result):
+    def _ccsr(self, result, int_only):
+        want = ('int',) if int_only else ('int', 'float')
         seen = set()
         alts = []
         for scope in self._scopes[1:] + self._scopes[:1]:
-            for name, is_scalar in scope.items():
-                if is_scalar and name not in seen:
+            for name, kind in scope.items():
+                if kind in want and name not in seen:
                     alts.append(c_ast.ID(name=name))
                     seen.add(name)
-        return self._ternary_chain(result, alts, "Ccrs")
+        return self._ternary_chain(result, alts[:_MAX_CONST_REPLACEMENTS], "Ccrs")
 
     def visit_Struct(self, node):
         return node
@@ -348,16 +417,23 @@ class MutationVisitor(c_ast.NodeVisitor):
     def visit_Typedef(self, node):
         if (isinstance(node.type, c_ast.TypeDecl) and
                 isinstance(node.type.type, c_ast.IdentifierType)):
-            names = set(node.type.type.names)
-            if names & _PRIMITIVE_INT_TYPES or names <= self._scalar_typedefs:
-                self._scalar_typedefs.add(node.name)
+            kind = self._kind_of_type(node.type)
+            if kind in ('int', 'float'):
+                self._scalar_typedefs[node.name] = kind
         return node
 
     def visit_Decl(self, node):
         if 'typedef' not in (node.storage or []):
-            is_scalar = self._is_scalar_type(node.type)
-            self._scopes[-1][node.name] = is_scalar
-        self.generic_visit(node)
+            self._scopes[-1][node.name] = self._kind_of_type(node.type)
+        static_storage = (
+            self._current_func_name is None or 'static' in (node.storage or [])
+        )
+        if static_storage:
+            old, self._suppress_all = self._suppress_all, True
+            self.generic_visit(node)
+            self._suppress_all = old
+        else:
+            self.generic_visit(node)
         return node
 
     def visit_Assignment(self, node):
@@ -399,9 +475,20 @@ class MutationVisitor(c_ast.NodeVisitor):
         self.generic_visit(node)
         return node
 
+    def visit_Case(self, node):
+        if node.expr is not None:
+            old, self._suppress_all = self._suppress_all, True
+            self.visit(node.expr)
+            self._suppress_all = old
+        for i, stmt in enumerate(node.stmts or []):
+            new = self.visit(stmt)
+            if new is not None and new is not stmt:
+                node.stmts[i] = new
+        return node
+
     # VTWD + VDTR
     def visit_ID(self, node):
-        if self._suppress_scalar or not self._is_scalar(node.name):
+        if self._suppress_all or self._suppress_scalar or not self._is_scalar(node.name):
             return node
         result = node
         if "VTWD" in self._enabled:
@@ -412,15 +499,24 @@ class MutationVisitor(c_ast.NodeVisitor):
 
     # Ccrc + Ccrs
     def visit_Constant(self, node):
-        if self._suppress_scalar or node.type not in _NUMERIC_CONST_TYPES:
+        if self._suppress_all or self._suppress_scalar or node.type not in _NUMERIC_CONST_TYPES:
             return node
         result = node
         key = (node.type, node.value)
+        int_only = node.type in _INTEGER_CONST_TYPES
         if "Ccrc" in self._enabled:
-            result = self._cccr(result, key)
+            result = self._cccr(result, key, int_only)
         if "Ccrs" in self._enabled:
-            result = self._ccsr(result)
+            result = self._ccsr(result, int_only)
         return result
+
+    def _register_params(self, decl):
+        ft = decl.type
+        if not isinstance(ft, c_ast.FuncDecl) or ft.args is None:
+            return
+        for p in ft.args.params:
+            if isinstance(p, c_ast.Decl) and p.name:
+                self._scopes[-1][p.name] = self._kind_of_type(p.type)
 
     def visit_FuncDef(self, node):
         func_name = node.decl.name
@@ -428,6 +524,7 @@ class MutationVisitor(c_ast.NodeVisitor):
             return node
         self._current_func_name = func_name
         self._scopes.append({})
+        self._register_params(node.decl)
         self.generic_visit(node)
         self._scopes.pop()
         self._current_func_name = None
@@ -435,7 +532,7 @@ class MutationVisitor(c_ast.NodeVisitor):
 
 
 def _collect_scalar_typedefs(tree):
-    scalar = set()
+    scalar = {}
 
     class _Tracker(c_ast.NodeVisitor):
         def visit_Typedef(self, node):
@@ -445,8 +542,13 @@ def _collect_scalar_typedefs(tree):
             if (isinstance(node.type, c_ast.TypeDecl) and
                     isinstance(node.type.type, c_ast.IdentifierType)):
                 names = set(node.type.type.names)
-                if names & _PRIMITIVE_INT_TYPES or names <= scalar:
-                    scalar.add(name)
+                if names & _FLOAT_PRIM_TYPES:
+                    scalar[name] = 'float'
+                elif names & _INTEGER_PRIM_TYPES:
+                    scalar[name] = 'int'
+                elif names <= scalar.keys():
+                    kinds = {scalar[n] for n in names}
+                    scalar[name] = 'float' if 'float' in kinds else 'int'
 
     _Tracker().visit(tree)
     return scalar
