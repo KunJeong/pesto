@@ -24,7 +24,7 @@ def extract_frame(line: str):
 def trace_summary(target: str, sensitivity: int = 1) -> str:
     """Return the crash signature for ``target`` keeping ``sensitivity`` frames."""
     result = subprocess.run(
-        [str(paths.PATCHED_PYTHON), target],
+        [str(paths.TRACE_PYTHON), target],
         capture_output=True,
         text=True,
     )

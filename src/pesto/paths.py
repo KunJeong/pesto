@@ -17,8 +17,12 @@ VENDOR_CPYTHON = PROJECT_ROOT / "vendor" / "cpython"
 
 # The patched interpreter is built as `python.exe` on macOS and `python` on
 # Linux/WSL; backtrace_symbols_fd() also formats frames differently per platform.
+# for mutation evaluation.
 IS_DARWIN = platform.system() == "Darwin"
 PATCHED_PYTHON = VENDOR_CPYTHON / ("python.exe" if IS_DARWIN else "python")
+
+# Instrumented-only interpreter for tracing/reduction.
+TRACE_PYTHON = VENDOR_CPYTHON / ("python-trace.exe" if IS_DARWIN else "python-trace")
 
 LONGOBJECT_META = VENDOR_CPYTHON / "pesto.json"
 

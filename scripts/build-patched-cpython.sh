@@ -7,3 +7,7 @@ git -C vendor/cpython apply "$ROOT/cpython-patch/instrumentation.patch"
 cd vendor/cpython
 ./configure
 make -j$(getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)
+
+# Snapshot the instrumented-only interpreter for tracing/reduction.
+if [ -f python.exe ]; then cp -p python.exe python-trace.exe; fi
+if [ -f python ];     then cp -p python     python-trace;     fi
