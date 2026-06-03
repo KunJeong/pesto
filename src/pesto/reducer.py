@@ -15,7 +15,7 @@ from . import paths, tracer
 DEFAULT_TRACE_SENSITIVITY = 10
 DEFAULT_REDUCER_JOBS = min(4, os.cpu_count() or 1)
 PERSES_THREADS = "1"
-SCRIPT_TIMEOUT_SECONDS = 60
+SCRIPT_TIMEOUT_SECONDS = 600
 
 
 def run_perses(*, input_file: str, results_dir: str, output_dir: str, sensitivity: int) -> None:
