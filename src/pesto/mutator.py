@@ -102,7 +102,7 @@ void __pesto_smtc(int limit) {
 """
 
 ALL_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "OASN", "OLBN", "SWDD", "SSDL", "Ccrc", "Ccrs", "SMTC"]
-DEFAULT_MUTATION_TYPES = ["ORRN", "VTWD", "VDTR", "SSDL"]
+DEFAULT_MUTATION_TYPES = list(ALL_MUTATION_TYPES)
 
 _ORRN_OPS = frozenset({"<", "<=", ">", ">=", "==", "!="})
 _ORRN_MUTATIONS = {

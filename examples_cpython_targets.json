@@ -3,14 +3,25 @@
     "PyNumber_Add",
     "PyNumber_And",
     "PyNumber_FloorDivide",
+    "PyNumber_Index",
+    "PyNumber_Lshift",
     "PyNumber_Multiply",
+    "PyNumber_Or",
+    "PyNumber_Power",
     "PyNumber_Remainder",
+    "PyNumber_Rshift",
     "PyNumber_Subtract",
+    "PyNumber_TrueDivide",
+    "PyNumber_Xor",
     "PyObject_GetBuffer",
     "PyObject_GetItem",
     "PyObject_GetIter",
+    "PyObject_Size",
     "_PyNumber_Index",
-    "binary_op"
+    "_PyNumber_PowerNoMod",
+    "binary_op",
+    "sequence_repeat",
+    "ternary_op"
   ],
   "Objects/object.c": [
     "PyObject_RichCompare"
@@ -22,18 +33,19 @@
   "Python/getargs.c": [
     "_PyArg_BadArgument"
   ],
-  "Python/ceval.c": [
-    "_PyEval_EvalFrameDefault"
-  ],
   "Python/bltinmodule.c": [
+    "builtin_chr",
+    "builtin_iter",
+    "builtin_len",
     "builtin_next",
-    "builtin_ord"
+    "builtin_ord",
+    "builtin_sum_impl"
   ],
   "Objects/bytearrayobject.c": [
-    "bytearray___init__"
+    "bytearray___init___impl"
   ],
   "Objects/complexobject.c": [
-    "complex_new"
+    "complex_new_impl"
   ],
   "Objects/listobject.c": [
     "list_concat",

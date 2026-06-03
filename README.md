@@ -34,7 +34,7 @@ mutate-cpython ([FILE] | --config JSON) [-m N ...] [--smtc-limit N]
 evaluate [--sample N] [--seed N] [--timeout S] [--tests-dir DIR]
 ```
 
-Mutation operators for `-m` (default `1 2 3 7`):
+Mutation operators for `-m` (default `1 2 3 4 5 6 7 8 9 10`, i.e. all):
 `1=ORRN 2=VTWD 3=VDTR 4=OASN 5=OLBN 6=SWDD 7=SSDL 8=Ccrc 9=Ccrs 10=SMTC`.
 
 `SMTC` instruments every `for`/`while`/`do-while` loop so the mutant `abort()`s
