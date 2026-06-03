@@ -41,17 +41,8 @@ def parse_args() -> argparse.Namespace:
 
 def extract_trace_function(log_path: Path) -> str | None:
     lines = log_path.read_text(encoding="utf-8", errors="replace").splitlines()
-    traces = "\n".join(lines[tracer._TRACE_SKIP:])
-    matches = TYPEERROR_BLOCK_RE.findall(traces)
-    if not matches:
-        return None
-
-    frames = [
-        frame
-        for line in matches[0].strip().splitlines()
-        if (frame := tracer.extract_frame(line)) is not None
-    ]
-    if len(frames) <= TRACE_INDEX:
+    frames = tracer.crash_block_frames(lines, TYPEERROR_BLOCK_RE)
+    if frames is None or len(frames) <= TRACE_INDEX:
         return None
     return frames[TRACE_INDEX]
 
