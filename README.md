@@ -32,6 +32,8 @@ summarize INPUT_DIR [-o OUTPUT_DIR]
 mutate (FILE.c ... | --config JSON) [-I DIR] [-m N ...] [--smtc-limit N]
 mutate-cpython ([FILE] | --config JSON) [-m N ...] [--smtc-limit N]
 evaluate [--sample N] [--seed N] [--timeout S] [--tests-dir DIR]
+sample-eval [INPUT_DIR] -k N [--seed N] [--timeout S] [--tests-dir DIR]
+                               # score a random K-case subset of a fuzz set
 ```
 
 Mutation operators for `-m` (default `1 2 3 4 5 6 7 8 9 10`, i.e. all):
@@ -74,6 +76,22 @@ be skipped to reuse prior output, e.g. re-evaluate without re-fuzzing:
 ```bash
 python src/pesto/cli.py pipeline --skip-fuzz --skip-reduce --skip-dedup
 ```
+
+### Scoring a sampled subset
+
+`evaluate --sample N` samples *mutations*. To instead sample *test cases* — pick
+K programs at random from a fuzz set and measure the mutation score of just that
+subset — use `sample-eval`:
+
+```bash
+python src/pesto/cli.py sample-eval pipeline_out/generated -k 20 --seed 1
+```
+
+`INPUT_DIR` defaults to `pipeline_out/generated`. Selection is reproducible via
+`--seed`, and the chosen cases are printed before evaluation. Existing `.py`
+cases are never modified; only `result.json` is written into `--tests-dir`
+(default: `INPUT_DIR`). It scores the subset against all mutants, so build the
+mutant set with `mutate-cpython` first.
 
 ### Layout
 

@@ -71,11 +71,12 @@ def _evaluate_mutant(python_exe, test_files, baselines, mutation_info, mid, time
     return mid, {"status": "survived", **info}
 
 
-def run_evaluation(sample=None, seed=42, timeout=10.0, tests_dir=None, binary=None, meta=None):
+def run_evaluation(sample=None, seed=42, timeout=10.0, tests_dir=None, binary=None, meta=None, test_files=None):
     python_exe = binary or str(LONGOBJECT_PYTHON)
     _meta = Path(meta) if meta else LONGOBJECT_META
     _tests_dir = Path(tests_dir) if tests_dir else TESTS_DIR
-    test_files = sorted(_tests_dir.glob("*.py"))
+    if test_files is None:
+        test_files = sorted(_tests_dir.glob("*.py"))
     if not test_files:
         raise ValueError(f"No .py files found in {_tests_dir}")
 
@@ -158,3 +159,29 @@ def run_evaluation(sample=None, seed=42, timeout=10.0, tests_dir=None, binary=No
     print(f"\nResults saved to {output}")
 
     return results
+
+
+def sample_and_evaluate(input_dir, k, seed=42, timeout=10.0,
+                        tests_dir=None, binary=None, meta=None):
+    pool = sorted(Path(input_dir).glob("*.py"))
+    if not pool:
+        raise ValueError(f"No .py files found in {input_dir}")
+
+    if k < len(pool):
+        rng = random.Random(seed)
+        chosen = sorted(rng.sample(pool, k))
+        print(f"Sampled {len(chosen)} of {len(pool)} test cases (seed={seed})")
+    else:
+        chosen = pool
+        print(f"Using all {len(pool)} test cases (k>=pool size)")
+    for p in chosen:
+        print(f"  {p.name}")
+
+    return run_evaluation(
+        seed=seed,
+        timeout=timeout,
+        tests_dir=tests_dir or input_dir,
+        binary=binary,
+        meta=meta,
+        test_files=chosen,
+    )

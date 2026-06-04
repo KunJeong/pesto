@@ -15,6 +15,7 @@ from pesto import (
     evaluator,
     fuzzer,
     mutator,
+    paths,
     pipeline,
     reducer,
     summarize,
@@ -161,6 +162,18 @@ def cmd_evaluate(args):
     )
 
 
+def cmd_sample_eval(args):
+    evaluator.sample_and_evaluate(
+        input_dir=args.input_dir,
+        k=args.num,
+        seed=args.seed,
+        timeout=args.timeout,
+        tests_dir=args.tests_dir,
+        binary=args.binary,
+        meta=args.meta,
+    )
+
+
 def cmd_pipeline(args):
     return pipeline.run_pipeline(
         args.workdir,
@@ -243,6 +256,16 @@ def build_parser():
     p.add_argument("--binary", default=None, metavar="PATH")
     p.add_argument("--meta", default=None, metavar="PATH")
     p.set_defaults(func=cmd_evaluate)
+
+    p = sub.add_parser("sample-eval", help="sample K fuzz test cases and compute their mutation score")
+    p.add_argument("input_dir", nargs="?", default=str(paths.DEFAULT_PIPELINE_DIR / "generated"))
+    p.add_argument("-k", "--num", type=int, required=True)
+    p.add_argument("--seed", type=int, default=42)
+    p.add_argument("--timeout", type=float, default=10.0)
+    p.add_argument("--tests-dir", default=None, metavar="DIR")
+    p.add_argument("--binary", default=None, metavar="PATH")
+    p.add_argument("--meta", default=None, metavar="PATH")
+    p.set_defaults(func=cmd_sample_eval)
 
     p = sub.add_parser("pipeline", help="run the full fuzz->reduce->dedup->evaluate flow")
     p.add_argument("workdir", nargs="?", default=None)
