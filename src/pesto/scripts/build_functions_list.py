@@ -44,7 +44,7 @@ def extract_trace_function(log_path: Path) -> str | None:
     frames = tracer.crash_block_frames(lines, TYPEERROR_BLOCK_RE)
     if frames is None or len(frames) <= TRACE_INDEX:
         return None
-    return frames[TRACE_INDEX]
+    return frames[TRACE_INDEX].split("+", 1)[0]
 
 
 def source_files(cpython_root: Path) -> list[tuple[Path, Path, list[str]]]:

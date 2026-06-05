@@ -7,17 +7,35 @@ from . import paths
 
 _EXCEPTION_DISPLAY_FRAMES = ("_PyErr_Display", "PyErr_Display", "sys_excepthook")
 
-_LINUX_FRAME_RE = re.compile(r"\(([^+)]+)\+")
+_LINUX_FRAME_RE = re.compile(r"(\S.*?)\(([^()]*)\)\s*\[")
+
+
+def _darwin_frame(line: str):
+    parts = line.split()
+    if len(parts) < 4:
+        return None
+    symbol = parts[3]
+    if len(parts) < 6 or parts[4] != "+":
+        return None if symbol.startswith("0x") else symbol
+    if symbol.startswith("0x"):
+        return f"{parts[1]}+{parts[5]}"
+    return f"{symbol}+{parts[5]}"
+
+
+def _linux_frame(line: str):
+    m = _LINUX_FRAME_RE.search(line)
+    if m is None:
+        return None
+    content = m.group(2)  # "<symbol>+0x<off>" | "+0x<off>" | "<symbol>" | ""
+    if content.startswith("+"):
+        module = m.group(1).rsplit("/", 1)[-1]
+        return f"{module}{content}"  # unresolved: module + offset from base
+    return content or None  # named, with +offset within the symbol when present
 
 
 def extract_frame(line: str):
-    if paths.IS_DARWIN:
-        # "0   python.exe   0x...   _PyErr_SetObject + 212"
-        parts = line.split()
-        return parts[3] if len(parts) >= 4 else None
-    # glibc: "python(_PyErr_SetObject+0x...) [0x...]"
-    m = _LINUX_FRAME_RE.search(line)
-    return m.group(1) if m else None
+    """A backtrace frame ``<symbol>+<offset>``"""
+    return _darwin_frame(line) if paths.IS_DARWIN else _linux_frame(line)
 
 
 def crash_block_frames(stderr_lines, block_re):
